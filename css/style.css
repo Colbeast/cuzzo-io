@@ -265,3 +265,10 @@ body.touch #ctlist,body.touch #ctb .hint:not(#perfh){display:none}
  #ctb,#cb{padding:12px 14px;max-height:94vh;overflow:auto}
  #loader .lt{font-size:42px}
 }
+
+/* lobby: no 3D background, plain backdrop with room for an ad on the right */
+#menu.lob{background:radial-gradient(ellipse at 30% 20%,#1c2026 0,#0b0c0d 75%)}
+#adrail{display:none;flex:1;align-items:center;justify-content:center;padding:24px}
+#menu.lob #adrail{display:flex}
+#adrail .ad{width:300px;height:250px;border:1px dashed #ffffff30;color:#ffffff50;display:flex;align-items:center;justify-content:center;font:500 13px var(--hd);letter-spacing:3px}
+@media(max-width:900px){#menu.lob #adrail{display:none}}
