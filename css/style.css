@@ -266,9 +266,32 @@ body.touch #ctlist,body.touch #ctb .hint:not(#perfh){display:none}
  #loader .lt{font-size:42px}
 }
 
-/* lobby: no 3D background, plain backdrop with room for an ad on the right */
-#menu.lob{background:radial-gradient(ellipse at 30% 20%,#1c2026 0,#0b0c0d 75%)}
-#adrail{display:none;flex:1;align-items:center;justify-content:center;padding:24px}
-#menu.lob #adrail{display:flex}
-#adrail .ad{width:300px;height:250px;border:1px dashed #ffffff30;color:#ffffff50;display:flex;align-items:center;justify-content:center;font:500 13px var(--hd);letter-spacing:3px}
-@media(max-width:900px){#menu.lob #adrail{display:none}}
+/* ---------- room list ---------- */
+#rbst{font-size:12px;letter-spacing:1px;color:var(--dim);text-transform:none}
+#rooms{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow:auto;touch-action:pan-y}
+#rooms .rb{display:flex;align-items:center;gap:10px;background:#ffffff08;border:1px solid var(--ln);padding:6px 8px}
+#rooms .rb.priv{background:#ffffff04}#rooms .rb.full{opacity:.55}
+#rooms .rbi{font-size:16px;width:20px;text-align:center}
+#rooms .rbm{flex:1;min-width:0}#rooms .rbm b{display:block;font:500 15px var(--hd);letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#rooms .rbm small{display:block;font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#rooms .rbp{font:700 14px var(--hd);color:var(--tx);min-width:34px;text-align:right}
+#rooms button{padding:6px 12px;font-size:13px;min-width:70px}
+#rooms .rbempty{color:var(--dim);font-size:13px;padding:6px 2px}
+#privrow{margin-top:8px}#privrow button.sel{border-color:var(--ac);color:var(--ac);box-shadow:inset 0 -3px 0 var(--ac)}#privrow .fine{margin:4px 0 0}
+@media (max-height:520px){#rooms{max-height:150px}#rooms .rb{padding:4px 6px}}
+
+/* ---------- menu background (no map behind the menus) ---------- */
+body.inmenu{background:radial-gradient(ellipse at 72% 38%,#28331f 0,#151a14 38%,#0b0c0d 75%)}
+body.inmenu #menu{background:linear-gradient(90deg,#0b0c0dcc 0,#0b0c0d99 560px,transparent 900px)}
+
+/* ---------- ad space (menus only) ---------- */
+#ads{position:absolute;right:40px;top:90px;bottom:24px;display:none;flex-direction:column;align-items:flex-end;justify-content:space-between;pointer-events:none}
+body.inmenu #ads{display:flex}
+#ads.off{display:none!important}
+#ads .adslot{position:relative;pointer-events:auto;box-sizing:border-box;border:1px dashed #ffffff22;background:#ffffff06;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#ads .adslot span{font:500 11px var(--bd);letter-spacing:2px;text-transform:uppercase;color:#ffffff40}
+#ad-300x250{width:300px;height:250px;margin-top:auto;margin-bottom:auto}
+#ad-728x90{width:728px;height:90px}
+/* only show a slot when it fits beside the menu (the menu is ~640px wide on the left) */
+@media (max-width:1460px){#ad-728x90{display:none!important}#ads{justify-content:center}}
+@media (max-width:1000px),(max-height:420px){#ad-300x250{display:none!important}}
