@@ -12,8 +12,9 @@ js/extras.js            drivable cars, third-person camera, car and squadmate ma
 js/perf.js              graphics quality (Auto / Low / Medium / High) and automatic resolution scaling
 js/mobile.js            touch controls for phones and tablets
 manifest.webmanifest    lets phones "Add to Home Screen" and play full screen in landscape
-js/turn-config.js       address of your TURN Worker (see TURN_SETUP.md)
-turn-worker/worker.js   Cloudflare Worker that hands out short-lived TURN logins
+js/turn-config.js       address of your TURN Worker (see SERVER_SETUP.md)
+js/rooms.js             public/private room list on the main menu
+server/                 Cloudflare Worker: TURN logins + room list (see SERVER_SETUP.md)
 assets/js/three.min.js  three.js r149 (MIT)
 assets/js/textures.js   textures bundled as data URIs (generated, don't edit)
 assets/textures/*.png   the source textures, viewable/editable
@@ -30,9 +31,14 @@ Texture letters: `p` plaster, `b` brick, `w` wood siding, `x` crate, `m` corruga
 `o` door planks, `r` rock, `e` glow, `z` thatch, `2` coral stone, `4` dock planks, `5` ice blocks, plus newer floor/road/siding textures
 (see `tools/build_textures.py` for the full list).
 
+## v6.2: public and private rooms
+- The main menu has a **Rooms** list. Public rooms show a Join button. Private rooms show with a lock and no code, so you need the code from the host.
+- Hosts pick **Public** or **Private** in the lobby (it remembers your choice). The list shows the room name, mode, map, players and whether a match is on.
+- Runs on the same Cloudflare Worker as the relay, now in the `server` folder. Deploy it with `npx wrangler deploy` (see SERVER_SETUP.md). Until it's set up, the game works like before with codes only.
+
 ## v6.1: TURN relay through Cloudflare
-- Players whose networks block direct connections (phone data, schools) can now connect through a Cloudflare TURN relay. Follow TURN_SETUP.md to set it up; until you do, the game plays exactly as before.
-- The secret key stays inside a Cloudflare Worker (`turn-worker/worker.js`), which only answers your own site, rate-limits requests and hands out logins that expire after 4 hours.
+- Players whose networks block direct connections (phone data, schools) can now connect through a Cloudflare TURN relay. Follow SERVER_SETUP.md to set it up; until you do, the game plays exactly as before.
+- The secret key stays inside a Cloudflare Worker (`server/src/index.js`), which only answers your own site, rate-limits requests and hands out logins that expire after 4 hours.
 
 ## v6.0: ready to publish - mobile support, faster on weak computers
 - **Phones and tablets**: the game detects touch screens and shows on-screen controls. Left thumb anywhere on the left side = joystick (push all the way up to sprint), right thumb = look around. Buttons: FIRE (drag on it to aim while shooting), AIM, JUMP, CROUCH, RELOAD, SWAP, USE, POWER, and BAG/DROP in Battle Royale. Tap a weapon slot to switch, tap the on-screen prompt to use it, MAP and pause buttons at the top. Phones go full screen in landscape when you start (where the browser allows it) and ask you to turn the device sideways if it's upright. Settings has a touch look sensitivity slider. Add `?touch=1` to the URL to test touch controls on a computer, or `?touch=0` to turn them off.

@@ -28,12 +28,14 @@
  <div class="card row"><img id="skpic" class="pic"><div style="flex:1"><h2>Survivor name</h2><input id="nm" class="wide" maxlength="10" placeholder="Player"><button id="chs1" class="alt" style="margin-top:8px;width:100%">Change outfit</button></div></div>
  <h2>Play online</h2>
  <div class="row"><button id="host" class="big">Host server</button><span class="or">or</span><input id="code" maxlength="4" placeholder="CODE" autocomplete="off"><button id="join" class="alt">Join</button></div>
+ <div id="rbwrap" style="display:none"><h2>Rooms <small id="rbst"></small></h2><div id="rooms"></div></div>
  <h2>Other</h2>
  <div class="row"><button id="prac" class="alt">Singleplayer practice</button><button id="mh" class="alt">Manual host</button><button id="mj" class="alt">Manual join</button></div>
  <p class="fine">Manual connect is a 2-player fallback for networks that block matchmaking.</p>
 </div>
 <div id="s-lobby" class="step">
  <div id="codebar" class="row card" style="justify-content:space-between"><div><h2 style="margin:0">Server code</h2><div id="big">....</div></div><div id="gmt">Share the code with friends<br>Free-for-all &middot; first to 15 kills</div></div>
+ <div id="privrow" style="display:none"><div class="row"><button id="rpub">&#127760; Public</button><button id="rpriv" class="alt">&#128274; Private</button></div><p class="fine" id="privh"></p></div>
  <h2>Players</h2><div id="plist"></div>
  <h2>Game mode</h2><div id="modes"><div class="tile on" id="m-ffa"><b>Free-for-all</b><span>First to 15 kills &middot; instant respawns</span></div><div class="tile" id="m-br"><b>Battle Royale</b><span>Huge map &middot; closing storm &middot; last one alive</span></div><div class="tile" id="m-sq"><b>Squads</b><span>2 teams of 4 &middot; drivable cars &middot; Pine Lake or Sunset Bay</span></div></div>
  <div id="vwrap"><h2>Vote for the map</h2><div id="vote"></div><p class="fine">Everyone in the lobby gets one vote. The map with the most votes is played when the host starts.</p></div><div id="mc"><img id="mimg"><div style="flex:1"><h2 style="margin:0 0 4px">Map</h2><b id="mn"></b><br><span id="md"></span><br><small id="mpick" style="color:var(--ac)"></small><div class="row" style="margin-top:12px"><button id="chmap" class="alt">Choose map</button><button id="vmode" class="alt">Map choice</button><button id="chs2" class="alt">Change outfit</button></div></div></div>
@@ -42,7 +44,10 @@
 <div id="s-man" class="step"><p id="mt"></p><textarea id="m1" readonly></textarea><p id="mt2"></p><textarea id="m2"></textarea><div class="row" style="margin-top:8px"><button id="mb">Connect</button><button id="mback" class="alt">Back</button></div></div>
 <p id="status">Host a server, join with a code, or try singleplayer practice.</p>
 <div id="keys"></div>
-</div><div id="adrail"><div class="ad" id="adslot">AD SPACE</div></div></div>
+</div>
+<!-- ad space (menus only, never during a match). Your ad network's code fills these boxes: see js/ads.js -->
+<div id="ads"><div class="adslot" id="ad-300x250"><span>Advertisement</span></div><div class="adslot" id="ad-728x90"><span>Advertisement</span></div></div>
+</div>
 
 <div id="ctl"><div id="ctb"><h3>Settings</h3><div class="cg">Sensitivity</div><div class="sr"><span>Mouse sensitivity</span><input type="range" id="sn-look" min="0.1" max="3" step="0.05"><b id="sv-look"></b></div><div class="sr"><span>Aiming sensitivity (hold aim)</span><input type="range" id="sn-ads" min="0.2" max="2" step="0.05"><b id="sv-ads"></b></div><div class="sr"><span>Sniper scope sensitivity</span><input type="range" id="sn-scope" min="0.2" max="2" step="0.05"><b id="sv-scope"></b></div><div class="cg">Camera</div><div class="sr"><span>Point of view</span><select id="camv"><option value="0">First person</option><option value="1">Third person</option></select><b></b></div><div class="cg">Graphics</div><div class="sr"><span>Performance mode (for slower computers)</span><select id="perfm"><option value="0">Off</option><option value="1">On</option></select><b></b></div><p class="hint" id="perfh">Lower resolution, no shadows, no grass or clouds, shorter view distance and no antialiasing. Turn it on if the game is laggy.</p><div class="cg">Controls</div><p class="hint">Click a control, then press any key, mouse button or scroll the wheel. Esc cancels, Delete unbinds. Binding a key that is already used swaps the two.</p><div id="ctlist"></div><div class="row" style="justify-content:center;margin-top:14px"><button id="ctdone">Done</button><button id="ctreset" class="alt">Reset to defaults</button></div></div></div>
 <div id="car"><div id="cb"><h3 id="ct"></h3><div id="cw"><div id="cv"><div id="ctr"></div></div><button class="ar l" id="cp">&#9664;</button><button class="ar r" id="cn">&#9654;</button></div><div id="cdots"></div><div class="row" style="justify-content:center;margin-top:12px"><button id="cok">Select</button><button id="cx" class="alt">Cancel</button></div></div></div>
@@ -57,5 +62,7 @@
 <script src="js/bot.js"></script>
 <script src="js/perf.js"></script>
 <script src="js/fx.js"></script>
+<script src="js/rooms.js"></script>
+<script src="js/ads.js"></script>
 <script src="js/mobile.js"></script>
 </body></html>

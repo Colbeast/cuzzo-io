@@ -1,0 +1,15 @@
+# Cuzzo io server: TURN logins + the public/private room list.
+# Deploy from this folder with:  npx wrangler deploy
+name = "cuzzo-io"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+# keep the TURN_KEY_ID / ALLOWED_ORIGINS settings you already added in the dashboard
+keep_vars = true
+
+[[durable_objects.bindings]]
+name = "LOBBY"
+class_name = "Lobby"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Lobby"]
