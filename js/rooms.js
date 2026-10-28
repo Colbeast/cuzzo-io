@@ -18,7 +18,8 @@ function info(){return{code:myCode(),token:H.token,name:(me.name||'Player')+"'s 
 function closeRoom(){if(!H.code)return;const b={code:H.code,token:H.token};H.code=null;H.token=null;H.sig='';
  try{navigator.sendBeacon(base+'/rooms/close',new Blob([JSON.stringify(b)],{type:'text/plain'}))}catch(e){post('/rooms/close',b).catch(()=>{})}}
 function hostTick(){
- if(!hosting()){closeRoom();return}
+ if(!hosting()){if(H.code||H.wasHosting){H.wasHosting=false;try{priv=localStorage.getItem('cf_priv')==='1'}catch(e){}}closeRoom();return}
+ H.wasHosting=true;
  const d=info();if(H.code&&H.code!==d.code)closeRoom();
  const sig=JSON.stringify([d.name,d.mode,d.map,d.players,d.priv,d.started]),now=Date.now();
  if(H.busy||(sig===H.sig&&now-H.t<30000)||(sig!==H.sig&&now-H.t<4000))return;
@@ -31,7 +32,7 @@ addEventListener('pagehide',closeRoom);
 function privUI(){const row=$('privrow');if(!row)return;const on=isHost&&!practice&&!!room;row.style.display=on?'':'none';if(!on)return;
  $('rpub').className=priv?'alt':'alt sel';$('rpriv').className=priv?'alt sel':'alt';
  $('privh').textContent=(priv?'Private: your room shows in the room list with a lock. Players need your code to join.':'Public: your room shows in the room list and anyone can join.')+(H.err?' (Room list: '+H.err+')':'')}
-const setPriv=v=>{priv=v;try{localStorage.setItem('cf_priv',v?'1':'0')}catch(e){}H.t=0;privUI();hostTick()};window.roomSetPriv=setPriv;
+const setPriv=(v,noSave)=>{priv=v;if(!noSave)try{localStorage.setItem('cf_priv',v?'1':'0')}catch(e){}H.t=0;privUI();hostTick()};window.roomSetPriv=setPriv;
 $('rpub').onclick=()=>setPriv(false);$('rpriv').onclick=()=>setPriv(true);
 setInterval(privUI,1000);
 

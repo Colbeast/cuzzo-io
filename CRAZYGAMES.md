@@ -37,7 +37,7 @@ fire, aim, jump, crouch, reload, swap and use.
 ## What's already done for their rules
 - SDK: loading start/stop and gameplay start/stop (pausing, menus, spectating and ads all count as stopped)
 - One click (Play now) from the menu to gameplay: it joins a running public free-for-all match if there is one,
-  otherwise it starts a practice match against the bot
+  otherwise it opens a new public match and starts it right away (the next player who presses Play now joins)
 - The player's CrazyGames username is their in-game name
 - Follows CrazyGames' mute-audio and disable-chat settings
 - Chat moderation: a filter for swear words and slurs in chat, player names and room names
