@@ -70,6 +70,7 @@ That's plenty to start. If the game gets big, the Workers Paid plan is $5/month.
    - `TURN_KEY_ID` (Text): the Turn Token ID
    - `TURN_KEY_API_TOKEN` (Secret): the API Token
    - `ALLOWED_ORIGINS` (Text): your game's site, e.g. `https://yourname.github.io` (no slash at the end;
-     separate several sites with commas)
+     separate several sites with commas). For CrazyGames add `https://*.crazygames.com, https://crazygames.com`
+     (the `*.` part matches every CrazyGames subdomain)
 3. Deploy the server as above.
 4. Set a billing alert in Cloudflare so you hear about it if relay use ever goes past the free 1,000 GB.

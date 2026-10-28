@@ -6,7 +6,8 @@
 //   POST /rooms/close  a host removes its room
 //
 // Settings on the Worker (Settings > Variables and Secrets):
-//   TURN_KEY_ID (Text), TURN_KEY_API_TOKEN (Secret), ALLOWED_ORIGINS (Text, comma separated sites)
+//   TURN_KEY_ID (Text), TURN_KEY_API_TOKEN (Secret), ALLOWED_ORIGINS (Text, comma separated sites;
+//   wildcards like https://*.crazygames.com are allowed)
 
 const TURN_TTL = 4 * 60 * 60;
 const ROOM_EXPIRE_MS = 75 * 1000;     // a room disappears if its host stops checking in for 75 s
@@ -39,8 +40,7 @@ let listCache = null, listCacheT = 0;
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '';
-    const allowed = (env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim().replace(/\/+$/, '')).filter(Boolean);
-    if (!allowed.includes(origin)) return new Response('Forbidden', { status: 403 });
+    if (!originAllowed(origin, env.ALLOWED_ORIGINS)) return new Response('Forbidden', { status: 403 });
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(origin) });
 
     const url = new URL(request.url), path = url.pathname.replace(/\/+$/, '') || '/';
@@ -72,6 +72,17 @@ export default {
 };
 
 const lobby = env => env.LOBBY.get(env.LOBBY.idFromName('main'));
+
+// ALLOWED_ORIGINS entries: an exact site ("https://yourname.github.io") or a wildcard for every subdomain
+// ("https://*.crazygames.com" matches https://anything.crazygames.com and https://a.b.crazygames.com).
+function originAllowed(origin, list) {
+  let o; try { o = new URL(origin); } catch (e) { return false; }
+  return String(list || '').split(',').map(s => s.trim().replace(/\/+$/, '')).filter(Boolean).some(p => {
+    const m = p.match(/^(https?):\/\/\*\.(.+)$/i);
+    if (m) return o.protocol === m[1].toLowerCase() + ':' && o.hostname.toLowerCase().endsWith('.' + m[2].toLowerCase());
+    try { return new URL(p).origin === o.origin; } catch (e) { return false; }
+  });
+}
 
 async function turn(env, origin, ip) {
   if (limited('t' + ip, 10)) return new Response('Too many requests', { status: 429, headers: cors(origin) });

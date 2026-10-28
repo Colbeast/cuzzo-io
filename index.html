@@ -6,6 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Permanent+Marker&family=Oswald:wght@500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<script src="https://sdk.crazygames.com/crazygames-sdk-v3.js" async></script>
 </head><body>
 <div id="loader"><div class="lt">CUZZO<span class="logotag">io</span></div><div class="ls">Building the world...</div><div class="lb"><i></i></div></div>
 
@@ -21,17 +22,18 @@
 <div id="bigmap"><canvas id="bmc" width="900" height="900"></canvas><small id="bms"></small></div>
 <div id="rl"><span>RELOADING</span><div id="rlb"><div id="rlf"></div></div></div><div id="stormfx"></div><div id="spec"></div><div id="banner"></div></div>
 
-<div id="clickplay"><div><b>The match has started</b><span>Click anywhere to play</span></div></div><div id="menu"><div id="box">
+<div id="cgblock"></div><div id="clickplay"><div><b>The match has started</b><span>Click anywhere to play</span></div></div><div id="menu"><div id="box">
 <div class="brand"><h1>CUZZO<span class="logotag">io</span></h1><button id="ctlb" class="alt">&#9881; Settings</button></div>
 <p class="sub">Arena shooter &middot; free-for-all, battle royale &amp; squads &middot; up to 8 survivors</p>
 <div id="s-main" class="step on">
- <div class="card row"><img id="skpic" class="pic"><div style="flex:1"><h2>Survivor name</h2><input id="nm" class="wide" maxlength="10" placeholder="Player"><button id="chs1" class="alt" style="margin-top:8px;width:100%">Change outfit</button></div></div>
+ <div class="card row"><img id="skpic" class="pic"><div style="flex:1"><h2>Survivor name</h2><input id="nm" class="wide" maxlength="16" placeholder="Player"><button id="chs1" class="alt" style="margin-top:8px;width:100%">Change outfit</button></div></div>
+ <button id="qplay" class="big">&#9654; Play now</button>
  <h2>Play online</h2>
  <div class="row"><button id="host" class="big">Host server</button><span class="or">or</span><input id="code" maxlength="4" placeholder="CODE" autocomplete="off"><button id="join" class="alt">Join</button></div>
  <div id="rbwrap" style="display:none"><h2>Rooms <small id="rbst"></small></h2><div id="rooms"></div></div>
  <h2>Other</h2>
  <div class="row"><button id="prac" class="alt">Singleplayer practice</button><button id="mh" class="alt">Manual host</button><button id="mj" class="alt">Manual join</button></div>
- <p class="fine">Manual connect is a 2-player fallback for networks that block matchmaking.</p>
+ <p class="fine">Manual connect is a 2-player fallback for networks that block matchmaking. Online play connects you directly to other players, who can see your name and chat messages.</p>
 </div>
 <div id="s-lobby" class="step">
  <div id="codebar" class="row card" style="justify-content:space-between"><div><h2 style="margin:0">Server code</h2><div id="big">....</div></div><div id="gmt">Share the code with friends<br>Free-for-all &middot; first to 15 kills</div></div>
@@ -56,6 +58,7 @@
 <script src="assets/js/textures.js"></script>
 <script>window.trysteroReady=import('https://esm.run/trystero').then(m=>({joinRoom:m.joinRoom}));</script>
 <script src="js/turn-config.js"></script>
+<script src="js/filter.js"></script>
 <script src="js/game.js"></script>
 <script src="js/extras.js"></script>
 <script src="js/loot.js"></script>
@@ -64,5 +67,6 @@
 <script src="js/fx.js"></script>
 <script src="js/rooms.js"></script>
 <script src="js/ads.js"></script>
+<script src="js/crazygames.js"></script>
 <script src="js/mobile.js"></script>
 </body></html>
