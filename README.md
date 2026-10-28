@@ -1,6 +1,6 @@
 # Cuzzo io
 
-Open `index.html` in Chrome (double-click works). Online play needs an internet connection; singleplayer practice works offline.
+Open `index.html` in Chrome (double-click works). Online play needs an internet connection; if online play is blocked, Play now gives you a match against the bot instead.
 
 ## What's in the folder
 
@@ -30,6 +30,12 @@ Texture letters: `p` plaster, `b` brick, `w` wood siding, `x` crate, `m` corruga
 `c` concrete, `f` ground/grass detail, `g` skyscraper windows, `t` roof shingles,
 `o` door planks, `r` rock, `e` glow, `z` thatch, `2` coral stone, `4` dock planks, `5` ice blocks, plus newer floor/road/siding textures
 (see `tools/build_textures.py` for the full list).
+
+## v6.5: Play now is matchmaking
+- **Play now** joins a public free-for-all match that's already running and has space. If there isn't one, it opens a new public free-for-all match and starts it right away; it shows in the Rooms list as "in a match", so the next person who presses Play now joins you.
+- If the host it tries doesn't answer within 8 seconds, it opens your own match instead. If online play is blocked on your network, you play against the bot.
+- The Singleplayer practice button is gone.
+- Play now matches are always public; your Public / Private choice for Host server is kept.
 
 ## v6.4.1: the Josh Rice skin is now called Martin
 

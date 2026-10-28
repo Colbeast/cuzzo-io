@@ -32,23 +32,44 @@ if(typeof chatMsg==='function'){const c0=chatMsg;chatMsg=function(){if(CG.chatOf
 function applySettings(s){if(!s)return;CG.muteSdk=!!s.muteAudio;CG.chatOff=!!s.disableChat;applyMute();
  const L=$('chatlog');if(L)L.style.display=CG.chatOff?'none':'';if(CG.chatOff&&typeof chatOn!=='undefined'&&chatOn&&typeof closeChat==='function')closeChat()}
 
-// ---------- PLAY NOW: one click into a match ----------
+// ---------- PLAY NOW: one click into an online match (matchmaking) ----------
 // 1. If a public free-for-all room is in the middle of a match and has space, join it (you respawn straight in).
-// 2. Otherwise (or if that host doesn't answer within 8 s), start a practice match against the bot.
+// 2. Otherwise open a new public free-for-all match and start playing right away. It shows in the Rooms list
+//    as "in a match", so the next person who presses Play now joins you.
 // Free-for-all only, because joining a Battle Royale or Squads match halfway puts you in as a spectator.
+// If online play isn't possible at all on this network, you get an offline match against the bot instead.
 let qpBusy=false;
-function practiceNow(){if(room||go||practice)return;
- $('prac').click();// sets up a practice free-for-all on the current arena map
- $('go').click();// starts it and locks the mouse in the same click when possible, so you're playing at once
+const alone=()=>roster().filter(e=>e.id!=='bot').length<=1;
+function offlineNow(){if(room||go||practice)return;
+ $('prac').click();// (hidden) practice setup: free-for-all against the bot on the current arena map
+ $('go').click()}
+function hostNow(){if(room||go||practice)return;
+ if(typeof rtcOK==='function'&&!rtcOK()){offlineNow();return}
+ isHost=true;me.id='h';
+ if(gm!==0&&typeof hostMode==='function')hostMode(0);
+ if(MAPS[mapIdx].br)loadMap(lastFFA);
+ const code=Array.from({length:4},()=>AL[Math.random()*AL.length|0]).join('');
+ $('big').textContent=code;step('lobby');
+ if(typeof roomSetPriv==='function')roomSetPriv(false,true);// Play now matches are always public (doesn't change your Host server choice)
+ renderLobby();$('go').disabled=false;// the Start button is disabled until the menu knows you're the host
+ $('go').click();// starts the match and locks the mouse inside this click, so you're playing immediately
+ status('Your public match is open. Anyone who presses Play now will join you.');
+ startRoom(code).then(()=>{if(typeof feed==='function')feed('Online: players who press Play now will join your match')})
+  .catch(e=>{console.error(e);if(room||!go||!isHost)return;
+   // online play is blocked on this network: keep playing, but against the bot so you're not alone
+   practice=true;const b=addP('bot','Practice Bot');b.sk=1;if(typeof botSpawn==='function')botSpawn();
+   status('Online play is blocked on this network, so you\'re playing against the bot.');
+   if(typeof feed==='function')feed('Can\'t go online here - playing against the bot',1)});
 }
 async function quickPlay(){if(typeof booted!=='undefined'&&!booted)return;if(room||go||practice||qpBusy)return;
  const btn=$('qplay');let rooms=[];
- if(typeof roomsNow==='function'&&typeof rtcOK==='function'){qpBusy=true;btn.disabled=true;status('Looking for a match...');
+ if(typeof roomsNow==='function'){qpBusy=true;btn.disabled=true;status('Looking for a match...');
   try{rooms=await roomsNow(2500)}catch(e){rooms=[]}}
+ qpBusy=false;btn.disabled=false;
  const pick=rooms.filter(r=>r&&!r.priv&&r.code&&r.mode===0&&r.started&&r.players<r.max).sort((a,b)=>b.players-a.players)[0];
- if(!pick||!rtcOK()){qpBusy=false;btn.disabled=false;practiceNow();return}
- status('Joining '+cleanWords(String(pick.name||'a match'))+'...');isHost=false;
- const giveUp=()=>{qpBusy=false;btn.disabled=false;try{leave()}catch(e){}status('That match didn\'t answer, so here\'s a practice match instead.');practiceNow()};
+ if(!pick||(typeof rtcOK==='function'&&!rtcOK())){hostNow();return}
+ qpBusy=true;btn.disabled=true;status('Joining '+cleanWords(String(pick.name||'a match'))+'...');isHost=false;
+ const giveUp=()=>{qpBusy=false;btn.disabled=false;try{leave()}catch(e){}hostNow()};// that host didn't answer: open our own match instead
  try{await startRoom(pick.code)}catch(e){giveUp();return}
  const t0=performance.now();
  const tm=setInterval(()=>{
@@ -102,7 +123,7 @@ function startWatchers(){const sdk=CG.sdk;let playing=false,wasEnding=false,wasO
   const p=playingNow();
   if(p!==playing){playing=p;if(p){safe(()=>sdk.game.gameplayStart());if(typeof cgBannersClear==='function')cgBannersClear()}else safe(()=>sdk.game.gameplayStop())}
   // natural breaks for a midgame ad
-  if(go&&ending&&!wasEnding&&(ELIM()||practice))setTimeout(midgame,2500);// match over (BR / Squads go back to the lobby; practice waits for the ad)
+  if(go&&ending&&!wasEnding&&(ELIM()||practice||(isHost&&alone())))setTimeout(midgame,2500);// match over (BR / Squads go back to the lobby; a solo host's next round waits for the ad)
   if(go&&me.out&&!wasOut&&!ending&&ELIM())setTimeout(midgame,2000);// eliminated, now spectating
   wasEnding=!!(go&&ending);wasOut=!!(go&&me.out);
   // CrazyGames invite button while you're in a lobby that can be joined
@@ -123,7 +144,7 @@ function midgame(){const sdk=CG.sdk;if(!sdk||CG.adBusy||Date.now()-CG.lastAd<180
  setTimeout(done,90000);// never leave the game blocked if the SDK goes quiet
 }
 // a practice match restarts by itself after 6 s; if an ad is playing, start the next one once it's over
-if(typeof newMatch==='function'){const n0=newMatch;newMatch=function(){if(CG.adBusy&&practice){const a=arguments,t=this;CG.after=()=>newMatch.apply(t,a);return}return n0.apply(this,arguments)}}
+if(typeof newMatch==='function'){const n0=newMatch;newMatch=function(){if(CG.adBusy&&(practice||(isHost&&alone()))){const a=arguments,t=this;CG.after=()=>newMatch.apply(t,a);return}return n0.apply(this,arguments)}}
 
 // "Copy invite link" button in the lobby (CrazyGames only)
 function inviteUI(code){let b=$('cginv');const row=$('privrow');if(!row)return;
