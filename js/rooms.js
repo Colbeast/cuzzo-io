@@ -31,26 +31,30 @@ addEventListener('pagehide',closeRoom);
 function privUI(){const row=$('privrow');if(!row)return;const on=isHost&&!practice&&!!room;row.style.display=on?'':'none';if(!on)return;
  $('rpub').className=priv?'alt':'alt sel';$('rpriv').className=priv?'alt sel':'alt';
  $('privh').textContent=(priv?'Private: your room shows in the room list with a lock. Players need your code to join.':'Public: your room shows in the room list and anyone can join.')+(H.err?' (Room list: '+H.err+')':'')}
-const setPriv=v=>{priv=v;try{localStorage.setItem('cf_priv',v?'1':'0')}catch(e){}H.t=0;privUI();hostTick()};
+const setPriv=v=>{priv=v;try{localStorage.setItem('cf_priv',v?'1':'0')}catch(e){}H.t=0;privUI();hostTick()};window.roomSetPriv=setPriv;
 $('rpub').onclick=()=>setPriv(false);$('rpriv').onclick=()=>setPriv(true);
 setInterval(privUI,1000);
 
 // ---------- room list ----------
 const wrap=$('rbwrap'),list=$('rooms'),st=$('rbst');wrap.style.display='';
-let lastLoad=0,loading=false;
+let lastLoad=0,loading=false,lastRooms=null;
+// for Play now: the current room list (reuses the list on screen if it's under 10 s old, so the click stays instant)
+window.roomsNow=function(timeout){if(lastRooms&&Date.now()-lastRooms.t<10000)return Promise.resolve(lastRooms.rooms);
+ const ac2=new AbortController(),t=setTimeout(()=>ac2.abort(),timeout||2500);
+ return fetch(base+'/rooms',{cache:'no-store',signal:ac2.signal}).then(r=>r.ok?r.json():Promise.reject(r.status)).then(j=>{clearTimeout(t);const rs=(j&&j.rooms)||[];lastRooms={t:Date.now(),rooms:rs};return rs})};
 function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
 function render(rooms){list.textContent='';
  if(!rooms.length){list.appendChild(el('div','rbempty','No rooms open right now. Host one!'));return}
  rooms.forEach(r=>{const row=el('div','rb'+(r.priv?' priv':'')+(r.players>=r.max?' full':''));
   row.appendChild(el('span','rbi',r.priv?'\u{1F512}':'\u{1F310}'));
-  const mid=el('div','rbm');mid.appendChild(el('b',null,r.name));mid.appendChild(el('small',null,MODES[r.mode]+' · '+(r.map||'?')+' · '+(r.started?'in a match':'in the lobby')));row.appendChild(mid);
+  const mid=el('div','rbm');mid.appendChild(el('b',null,cleanWords(String(r.name||'Room').slice(0,24))));mid.appendChild(el('small',null,MODES[r.mode]+' · '+(r.map||'?')+' · '+(r.started?'in a match':'in the lobby')));row.appendChild(mid);
   row.appendChild(el('span','rbp',r.players+'/'+r.max));
   const b=el('button',r.priv?'alt':'',r.players>=r.max?'Full':r.priv?'Code':'Join');b.disabled=r.players>=r.max;
   b.onclick=()=>{if(r.priv||!r.code){$('code').value='';$('code').focus();status('\u{1F512} '+r.name+' is private. Type the 4-letter code the host gave you, then press Join.');return}
    $('code').value=r.code;$('join').onclick()};
   row.appendChild(b);list.appendChild(row)})}
 function load(force){const now=Date.now();if(loading||(!force&&now-lastLoad<10000))return;loading=true;lastLoad=now;
- fetch(base+'/rooms',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject(r.status)).then(j=>{const rs=(j&&j.rooms)||[];
+ fetch(base+'/rooms',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject(r.status)).then(j=>{const rs=(j&&j.rooms)||[];lastRooms={t:Date.now(),rooms:rs};
   st.textContent=rs.length?'· '+rs.filter(r=>!r.priv).length+' public, '+rs.filter(r=>r.priv).length+' private':'';render(rs)})
   .catch(()=>{st.textContent='· can\'t reach the room list right now';list.textContent=''}).finally(()=>{loading=false})}
 // refresh every 10 s while the main menu is showing (and the tab is visible)

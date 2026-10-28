@@ -2233,13 +2233,23 @@ function instMesh(geo,mt,arr){const im=new THREE.InstancedMesh(geo,mt,arr.length
  im.castShadow=im.receiveShadow=true;im.frustumCulled=false;im.instanceMatrix.needsUpdate=true;if(col)im.instanceColor.needsUpdate=true;return im}
 // ---------- robots & skins ----------
 function faceTex(s){const c=document.createElement('canvas');c.width=c.height=16;const g=c.getContext('2d'),h=v=>'#'+hex(v);
- g.fillStyle=h(s.sk);g.fillRect(0,0,16,16);if(s.mask){g.fillStyle=h(s.mask);g.fillRect(0,0,16,5);g.fillRect(0,9,16,7)}
+ g.fillStyle=h(s.sk);g.fillRect(0,0,16,16);if(s.face&&FACES[s.face]){FACES[s.face](g,h,s);const t=new THREE.CanvasTexture(c);t.magFilter=t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;t.encoding=THREE.sRGBEncoding;return t}if(s.mask){g.fillStyle=h(s.mask);g.fillRect(0,0,16,5);g.fillRect(0,9,16,7)}
  g.fillStyle=h(s.ha);g.fillRect(3,4,4,1);g.fillRect(9,4,4,1);g.fillStyle='#fff';g.fillRect(4,6,3,3);g.fillRect(9,6,3,3);g.fillStyle='#1b1b1b';g.fillRect(5,6,2,3);g.fillRect(10,6,2,3);
  if(s.ugly){g.fillStyle=h(s.sk);g.fillRect(2,3,12,7);g.fillStyle='#2a2016';g.fillRect(3,4,10,1);g.fillStyle='#fff';g.fillRect(4,5,3,3);g.fillRect(10,6,2,2);g.fillStyle='#1b1b1b';g.fillRect(4,6,1,2);g.fillRect(11,6,1,1);
   g.fillStyle='#d08a78';g.fillRect(6,8,4,3);g.fillStyle='#5a2a22';g.fillRect(7,9,1,1);g.fillRect(9,9,1,1);g.fillStyle='#4a1a14';g.fillRect(4,12,8,2);g.fillStyle='#e8e0a0';g.fillRect(5,12,1,1);g.fillRect(7,12,1,1);g.fillRect(10,12,1,1);
   g.fillStyle='rgba(60,40,20,.35)';[[3,11],[12,11],[4,14],[11,14],[2,13],[13,13],[6,15],[9,15]].forEach(([x,y])=>g.fillRect(x,y,1,1));g.fillStyle='#8a5a3a';g.fillRect(12,9,1,1);g.fillStyle='rgba(120,190,255,.7)';g.fillRect(1,5,1,2)}
  else if(!s.mask){g.fillStyle='rgba(0,0,0,.16)';g.fillRect(7,9,2,2);g.fillStyle='#5a2a22';g.fillRect(6,12,4,1);g.fillRect(5,11,1,1);g.fillRect(10,11,1,1)}
  const t=new THREE.CanvasTexture(c);t.magFilter=t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;t.encoding=THREE.sRGBEncoding;return t}
+// custom 16x16 faces for skins that aren't people
+const FACES={
+ cone:g=>{g.fillStyle='#2a1406';[[3,3],[4,3],[5,4],[6,4],[12,3],[11,3],[10,4],[9,4]].forEach(([x,y])=>g.fillRect(x,y,1,1));
+  g.fillStyle='#fff';g.fillRect(4,6,3,3);g.fillRect(9,6,3,3);g.fillStyle='#1b1b1b';g.fillRect(5,7,2,2);g.fillRect(9,7,2,2);
+  g.fillStyle='#5a1e08';g.fillRect(5,12,6,1);g.fillRect(4,13,1,1);g.fillRect(11,13,1,1)},
+ toaster:g=>{g.fillStyle='rgba(255,255,255,.55)';g.fillRect(2,2,1,11);g.fillRect(3,2,1,2);
+  g.fillStyle='#fff';g.fillRect(4,6,3,2);g.fillRect(9,6,3,2);g.fillStyle='#1b1b1b';g.fillRect(5,7,2,1);g.fillRect(9,7,2,1);
+  g.fillStyle='#5c636c';g.fillRect(3,5,5,1);g.fillRect(8,5,5,1);g.fillStyle='#2a2f36';g.fillRect(6,11,4,1)},
+ robot:g=>{g.fillStyle='#161c24';g.fillRect(2,3,12,10);g.fillStyle='#38e8ff';g.fillRect(4,5,3,3);g.fillRect(9,5,3,3);
+  g.fillStyle='#bff8ff';g.fillRect(4,5,1,1);g.fillRect(9,5,1,1);g.fillStyle='#1f9fb4';[4,6,8,10].forEach(x=>g.fillRect(x,10,1,1));g.fillRect(4,11,7,1)}};
 function mkRobot(){const g=new THREE.Group(),legs=[],guns=[],P={sh:[],pa:[],sk:[],so:[],hr:[],vi:[]},a=(p,kk,...r)=>{const m=bx(p,...r,1);P[kk].push(m);return m};
  [-.15,.15].forEach(x=>{const p=new THREE.Group();p.position.set(x,.86,0);g.add(p);a(p,'pa',.26,.8,.3,0x2b3440,0,-.4,0);a(p,'so',.28,.14,.38,0x15191f,0,-.8,-.04);legs.push(p)});
  a(g,'sh',.62,.72,.34,0xd9483b,0,1.22,0);a(g,'pa',.6,.12,.34,0x2b3440,0,.9,0);
@@ -2264,8 +2274,13 @@ const SK=[{n:'Survivor',d:'Red hoodie, jeans and messy hair',sh:0xc2412f,pa:0x34
 {n:'Astronaut',d:'White suit, gold visor, jetpack',sh:0xf0f0f0,pa:0xdadada,sk:0xe8c4a0,ha:0xdddddd,so:0x888888,x:['as','pkw']},
 {n:'Knight',d:'Steel armour and red plume',sh:0x8e98a4,pa:0x5b6470,sk:0xe8c4a0,ha:0x5b6470,so:0x333840,x:['hm']},
 {n:'Farmer',d:'Overalls, plaid and a straw hat',sh:0xb8322a,pa:0x3d5f8f,sk:0xd9a883,ha:0xc9a64a,so:0x3a2414,x:['hat2']},
-{n:'Josh Rice',d:'Beret, Breton stripes and a big curly mustache',sh:0x1f3a7a,pa:0x2b2b30,sk:0xf0c8a8,ha:0x3a2414,so:0x1a1a1a,x:['beret','stache','stripes']},
- {n:'Big Fat Chum',d:'',sh:0xe6e0c8,pa:0x6a5a4a,sk:0xe0b090,ha:0x5a4a30,so:0x3a3a3a,x:['fat'],ugly:1}];
+{n:'Martin',d:'Beret, Breton stripes and a big curly mustache',sh:0x1f3a7a,pa:0x2b2b30,sk:0xf0c8a8,ha:0x3a2414,so:0x1a1a1a,x:['beret','stache','stripes']},
+ {n:'Big Fat Chum',d:'',sh:0xe6e0c8,pa:0x6a5a4a,sk:0xe0b090,ha:0x5a4a30,so:0x3a3a3a,x:['fat'],ugly:1},
+ {n:'Cone Head',d:'',sh:0xc8e83a,pa:0x2a2f38,sk:0xff7a1a,ha:0xff7a1a,so:0x1a1a1a,x:['cone','vest'],face:'cone'},
+ {n:'Toasty',d:'',sh:0xa9b1bb,pa:0x4a5058,sk:0xc9ced6,ha:0xb8bec7,so:0x1a1a1a,x:['toast'],face:'toaster'},
+ {n:'Pirate',d:'',sh:0xf2efe6,pa:0x3a2f28,sk:0xd9a17a,ha:0x1a1a1a,so:0x1a1410,x:['tricorn','patch','beard','pstripes','belt']},
+ {n:'Bolt',d:'',sh:0x9aa4b2,pa:0x5a636e,sk:0x8e98a6,ha:0x6a7380,so:0x2a2f36,x:['robo'],face:'robot'},
+ {n:'Chef',d:'',sh:0xf4f4f0,pa:0x2b2b30,sk:0xe8c4a0,ha:0x5a3a22,so:0x1a1a1a,x:['chef']}];
 EX.fat=[['g',.84,.7,.52,0xe6e0c8,0,1.24,0],['g',.76,.44,.22,0xe6e0c8,0,1.04,-.3],['g',.68,.14,.18,0xe0b090,0,.86,-.31],['g',.06,.05,.02,0x8a5a40,0,.89,-.405],
  ['g',.18,.13,.02,0xb8a060,.16,1.16,-.415],['g',.1,.09,.02,0xb03020,-.2,1.3,-.27],['g',.88,.14,.54,0x6a5a4a,0,.9,0],
  ['head',.5,.16,.42,0xe0b090,0,-.29,-.05],['head',.56,.12,.5,0xe0b090,0,-.18,0],['head',.08,.1,.08,0x8a6a40,.2,-.02,-.26],
@@ -2273,6 +2288,24 @@ EX.fat=[['g',.84,.7,.52,0xe6e0c8,0,1.24,0],['g',.76,.44,.22,0xe6e0c8,0,1.04,-.3]
 EX.beret=[['head',.6,.1,.6,0x1a1a1a,.03,.3,0],['head',.06,.08,.06,0x1a1a1a,.03,.38,0]];
 EX.stache=[['head',.24,.06,.04,0x3a2414,0,-.07,-.27],['head',.08,.06,.04,0x3a2414,-.15,-.05,-.27],['head',.08,.06,.04,0x3a2414,.15,-.05,-.27],['head',.05,.07,.04,0x3a2414,-.2,0,-.27],['head',.05,.07,.04,0x3a2414,.2,0,-.27],['head',.04,.04,.04,0x3a2414,-.17,.04,-.27],['head',.04,.04,.04,0x3a2414,.17,.04,-.27]];
 EX.stripes=[0,1,2,3].map(k=>['g',.63,.07,.35,0xf4f4f0,0,.96+k*.16,0]);
+// ---- new skins: Cone Head, Toasty, Pirate, Bolt, Chef ----
+EX.cone=[['head',.66,.06,.66,0x222222,0,-.27,0],['head',.48,.1,.48,0xff7a1a,0,.3,0],['head',.38,.1,.38,0xf4f4f4,0,.4,0],['head',.3,.1,.3,0xff7a1a,0,.5,0],
+ ['head',.2,.1,.2,0xf4f4f4,0,.6,0],['head',.11,.08,.11,0xff7a1a,0,.69,0]];
+EX.vest=[['g',.64,.07,.36,0xe4e8ec,0,1.08,0],['g',.64,.07,.36,0xe4e8ec,0,1.34,0],['g',.08,.72,.36,0xff7a1a,0,1.22,0]];
+EX.toast=[['head',.4,.03,.09,0x2a2a2a,0,.345,-.09],['head',.4,.03,.09,0x2a2a2a,0,.345,.09],['head',.38,.26,.06,0xe0b06a,0,.46,-.09],['head',.38,.26,.06,0xe0b06a,0,.46,.09],
+ ['head',.4,.05,.07,0x8a5a2a,0,.6,-.09],['head',.4,.05,.07,0x8a5a2a,0,.6,.09],['head',.3,.18,.01,0xf2d9a0,0,.45,-.125],['head',.04,.04,.14,0x2a2a2a,.28,.04,0],['head',.06,.06,.06,0x1a1a1a,.29,.04,-.08],
+ ['head',.05,.08,.08,0x2a2a2a,.28,-.14,.08]];
+EX.tricorn=[['head',.7,.08,.62,0x1a1a1a,0,.32,0],['head',.46,.2,.42,0x1a1a1a,0,.44,0],['head',.7,.03,.04,0xd9a520,0,.37,-.31],['head',.1,.1,.03,0xf4f4f0,0,.44,-.22]];
+EX.patch=[['head',.15,.12,.03,0x111111,.085,.02,-.265],['head',.52,.03,.02,0x111111,0,.09,-.262]];
+EX.beard=[['head',.4,.12,.05,0x1a1a1a,0,-.21,-.26],['head',.2,.08,.05,0x1a1a1a,0,-.3,-.26]];
+EX.pstripes=[0,1,2,3].map(k=>['g',.63,.07,.35,0xb3261e,0,1.0+k*.16,0]);
+EX.belt=[['g',.64,.09,.36,0x5a3a1a,0,.95,0],['g',.11,.09,.02,0xd9a520,0,.95,-.19]];
+EX.robo=[['head',.04,.2,.04,0x3a3f46,0,.42,0],['head',.1,.1,.1,0xff3b3b,0,.56,0],['head',.08,.16,.16,0x3a3f46,-.29,0,0],['head',.08,.16,.16,0x3a3f46,.29,0,0],
+ ['g',.3,.22,.02,0x2a2f36,0,1.3,-.18],['g',.05,.05,.02,0x3aff8a,-.08,1.33,-.192],['g',.05,.05,.02,0xffd23a,0,1.33,-.192],['g',.05,.05,.02,0xff3b3b,.08,1.33,-.192],
+ ['g',.22,.04,.02,0x5a636e,0,1.24,-.192]];
+EX.chef=[['head',.56,.12,.56,0xffffff,0,.33,0],['head',.64,.3,.64,0xffffff,0,.53,0],['head',.5,.08,.5,0xf0f0ea,0,.71,0],['g',.36,.1,.37,0xd23a3a,0,1.55,0],
+ ['g',.18,.12,.04,0xd23a3a,0,1.45,-.18],['head',.2,.05,.04,0x5a3a22,0,-.08,-.27],
+ ...[1.36,1.22,1.08].flatMap(y=>[['g',.05,.05,.02,0x2a2a2a,-.09,y,-.18],['g',.05,.05,.02,0x2a2a2a,.09,y,-.18]])];
 EX.hat2=[['head',.82,.05,.82,0xd8bb63,0,.32,0],['head',.44,.2,.44,0xd8bb63,0,.43,0],['head',.46,.05,.46,0x8a3020,0,.36,0]];
 const FTX={};
 function applySkin(R,i){const s=SK[i]||SK[0],set=(a,c)=>a.forEach(m=>m.material.color.set(c));R.sk=i;set(R.P.sh,s.sh);set(R.P.pa,s.pa);set(R.P.sk,s.sk);set(R.P.hr,s.ha);set(R.P.so,s.so);set(R.P.vi,s.vi||0);R.P.vi.forEach(m=>m.visible=!!s.vi);
@@ -2441,8 +2474,8 @@ function rayBoxDistance(o,d,minX,minY,minZ,maxX,maxY,maxZ){
 
 
 // ---------- players ----------
-function tag(n){const c=document.createElement('canvas');c.width=256;c.height=64;const g=c.getContext('2d');g.font='bold 34px Arial';g.textAlign='center';g.lineWidth=6;g.strokeStyle='#000';g.fillStyle='#fff';g.strokeText(n,128,44);g.fillText(n,128,44);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true}));s.scale.set(2.4,.6,1);s.renderOrder=6;return s}
-function addP(id,name){if(players[id])return players[id];const R=mkRobot(),hb=new THREE.Mesh(new THREE.PlaneGeometry(1,.1),new THREE.MeshBasicMaterial({color:0x4fd18b,depthTest:false})),tg=tag(name);hb.renderOrder=5;hb.visible=tg.visible=false;scene.add(R.g,hb,tg);
+function tag(n){const c=document.createElement('canvas');c.width=256;c.height=64;const g=c.getContext('2d');g.font='bold 34px Arial';g.textAlign='center';g.lineWidth=6;g.strokeStyle='#000';g.fillStyle='#fff';g.strokeText(n,128,44,244);g.fillText(n,128,44,244);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true}));s.scale.set(2.4,.6,1);s.renderOrder=6;return s}
+function addP(id,name){if(players[id])return players[id];name=cleanName(name);const R=mkRobot(),hb=new THREE.Mesh(new THREE.PlaneGeometry(1,.1),new THREE.MeshBasicMaterial({color:0x4fd18b,depthTest:false})),tg=tag(name);hb.renderOrder=5;hb.visible=tg.visible=false;scene.add(R.g,hb,tg);
  return players[id]={id,name,R,hb,tg,rt:{x:0,y:0,z:0,yaw:0,pitch:0,w:0,hp:100,inv:0},sk:0,kills:0,deaths:0,seen:0,ph:0}}
 function delP(id){const p=players[id];if(!p)return;scene.remove(p.R.g,p.hb,p.tg);delete players[id]}
 // last-line safety: if a spot is somehow blocked (or would put you inside something), walk outwards to the nearest clear patch of ground
@@ -2632,7 +2665,7 @@ function hostMode(m){if(!isHost||practice||m===gm)return;if(!MAPS[mapIdx].br)las
  else if(m===1){if(!MAPS[mapIdx].br||SQM(MAPS[mapIdx]))loadMap(MAPS[lastBR]&&!SQM(MAPS[lastBR])?lastBR:BRI)}else if(MAPS[mapIdx].br)loadMap(lastFFA);lob();if(go){newMatch()}}
 $('m-ffa').onclick=()=>hostMode(0);$('m-br').onclick=()=>hostMode(1);$('m-sq').onclick=()=>hostMode(2);
 $('plist').onclick=e=>{const kb=e.target.closest('[data-kick]');if(kb){e.stopPropagation();const p=players[kb.dataset.kick];if(isHost&&p&&confirm('Kick '+p.name+' from the lobby?'))kickPlayer(kb.dataset.kick);return}const d=e.target.closest('[data-id]');if(d&&isHost&&SQ())moveTeam(d.dataset.id)};
-$('nm').oninput=()=>{me.name=($('nm').value.trim()||'Player').slice(0,10)};
+$('nm').oninput=()=>{me.name=cleanName($('nm').value,16)};
 $('leave').onclick=leave;$('mback').onclick=leave;
 function enter(){$('clickplay').style.display='none';$('menu').style.display='none';const ask=()=>{if(!go||document.pointerLockElement)return;$('clickplay').style.display='flex'};try{const p=ren.domElement.requestPointerLock();if(p&&p.catch)p.catch(ask)}catch(e){ask()}setTimeout(ask,600)}
 function autoJoin(){if(!go||document.pointerLockElement)return;$('menu').style.display='none';$('clickplay').style.display='flex';try{const p=ren.domElement.requestPointerLock();if(p&&p.catch)p.catch(()=>{})}catch(e){}}
@@ -2653,7 +2686,7 @@ addEventListener('keydown',e=>{if(chatOn){e.stopImmediatePropagation();if(e.key=
  if(e.code===BIND.chat&&document.pointerLockElement&&go&&!e.repeat){e.preventDefault();e.stopImmediatePropagation();openChat()}},true);
 function openChat(){chatOn=true;for(const c in k)k[c]=false;down=false;const i=$('chatin');i.value='';$('chatbox').style.display='flex';setTimeout(()=>i.focus(),0)}
 function closeChat(){chatOn=false;$('chatbox').style.display='none';$('chatin').blur()}
-function chatMsg(name,t,sk){const d=document.createElement('div'),n=document.createElement('b');n.textContent=name+': ';n.style.color='#'+hex((SK[sk]||SK[0]).sh);d.append(n,document.createTextNode(t));const L=$('chatlog');L.appendChild(d);while(L.children.length>7)L.firstChild.remove();beep(900,.05,'sine');setTimeout(()=>{d.classList.add('fade');setTimeout(()=>d.remove(),700)},9000)}
+function chatMsg(name,t,sk){t=cleanWords(t);const d=document.createElement('div'),n=document.createElement('b');n.textContent=name+': ';n.style.color='#'+hex((SK[sk]||SK[0]).sh);d.append(n,document.createTextNode(t));const L=$('chatlog');L.appendChild(d);while(L.children.length>7)L.firstChild.remove();beep(900,.05,'sine');setTimeout(()=>{d.classList.add('fade');setTimeout(()=>d.remove(),700)},9000)}
 document.addEventListener('pointerlockchange',()=>{if(!document.pointerLockElement){if(window.LINV)return;if(chatOn)closeChat();$('menu').style.display='flex';down=false;renderLobby()}});
 addEventListener('keydown',e=>{if(!document.pointerLockElement||e.repeat)return;press(e.code);if(me.out&&ELIM()){if(e.code==='ArrowRight')specNext(1);if(e.code==='ArrowLeft')specNext(-1)}});
 addEventListener('blur',()=>{for(const c in k)k[c]=false;down=false});

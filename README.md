@@ -31,6 +31,23 @@ Texture letters: `p` plaster, `b` brick, `w` wood siding, `x` crate, `m` corruga
 `o` door planks, `r` rock, `e` glow, `z` thatch, `2` coral stone, `4` dock planks, `5` ice blocks, plus newer floor/road/siding textures
 (see `tools/build_textures.py` for the full list).
 
+## v6.4.1: the Josh Rice skin is now called Martin
+
+## v6.4: new skins, menu background, scrolling room list
+- 5 new skins: **Cone Head** (traffic cone with an angry face and a hi-vis vest), **Toasty** (a grumpy toaster with toast popping out), **Pirate**, **Bolt** (a robot) and **Chef**.
+- The menus have a static low-poly background (assets/menu-bg.svg): a dusky sky, hills, a lit-up town, pine trees and a faint gold crosshair.
+- The Rooms list scrolls on its own (it stops growing after about 4 rooms) and doesn't drag the rest of the menu along when you reach the end.
+
+## v6.3: ready for CrazyGames
+- CrazyGames SDK built in (js/crazygames.js). It only switches on when the game runs on CrazyGames, so the same files still work on your own site.
+- **Play now** button: joins a public free-for-all match that's already running and has space; if there isn't one (or its host doesn't answer within 8 seconds) it starts a practice match against the bot.
+- CrazyGames usernames are used as player names, CrazyGames' mute-audio and disable-chat settings are followed, and loading / gameplay start / stop events are reported.
+- Ads only through the CrazyGames SDK: midgame video ads at natural breaks (after a Battle Royale / Squads match, after being eliminated, after a practice match), never during play, with audio muted and the screen blocked while they play; banners only in the menu ad slots, cleared when a match starts.
+- Invite links (Copy invite link button in the lobby), joining from an invite link, and instant multiplayer.
+- Chat and name filter (js/filter.js) for swear words and slurs; player names are now cleaned so nobody can inject code into other players' pages through their name. Names can be up to 16 characters.
+- The server accepts wildcard sites like `https://*.crazygames.com` in ALLOWED_ORIGINS (redeploy the server).
+- See CRAZYGAMES.md for how to upload.
+
 ## v6.2: public and private rooms
 - The main menu has a **Rooms** list. Public rooms show a Join button. Private rooms show with a lock and no code, so you need the code from the host.
 - Hosts pick **Public** or **Private** in the lobby (it remembers your choice). The list shows the room name, mode, map, players and whether a match is on.

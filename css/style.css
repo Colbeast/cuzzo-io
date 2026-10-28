@@ -268,7 +268,8 @@ body.touch #ctlist,body.touch #ctb .hint:not(#perfh){display:none}
 
 /* ---------- room list ---------- */
 #rbst{font-size:12px;letter-spacing:1px;color:var(--dim);text-transform:none}
-#rooms{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow:auto;touch-action:pan-y}
+#rooms{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;touch-action:pan-y;padding-right:4px;scrollbar-width:thin;scrollbar-color:#f0b23c66 transparent}
+#rooms::-webkit-scrollbar{width:6px}#rooms::-webkit-scrollbar-thumb{background:#f0b23c66;border-radius:3px}#rooms .rb{flex:none}
 #rooms .rb{display:flex;align-items:center;gap:10px;background:#ffffff08;border:1px solid var(--ln);padding:6px 8px}
 #rooms .rb.priv{background:#ffffff04}#rooms .rb.full{opacity:.55}
 #rooms .rbi{font-size:16px;width:20px;text-align:center}
@@ -281,7 +282,7 @@ body.touch #ctlist,body.touch #ctb .hint:not(#perfh){display:none}
 @media (max-height:520px){#rooms{max-height:150px}#rooms .rb{padding:4px 6px}}
 
 /* ---------- menu background (no map behind the menus) ---------- */
-body.inmenu{background:radial-gradient(ellipse at 72% 38%,#28331f 0,#151a14 38%,#0b0c0d 75%)}
+body.inmenu{background:#0b0c0d url(../assets/menu-bg.svg) center/cover no-repeat}
 body.inmenu #menu{background:linear-gradient(90deg,#0b0c0dcc 0,#0b0c0d99 560px,transparent 900px)}
 
 /* ---------- ad space (menus only) ---------- */
@@ -295,3 +296,11 @@ body.inmenu #ads{display:flex}
 /* only show a slot when it fits beside the menu (the menu is ~640px wide on the left) */
 @media (max-width:1460px){#ad-728x90{display:none!important}#ads{justify-content:center}}
 @media (max-width:1000px),(max-height:420px){#ad-300x250{display:none!important}}
+
+/* ---------- CrazyGames ---------- */
+#qplay{display:block;width:100%;margin:12px 0 2px;padding:14px 16px;font-size:22px;letter-spacing:3px}
+@media (max-height:520px){#qplay{padding:9px 12px;font-size:17px;margin-top:8px}}
+#cgblock{position:fixed;inset:0;z-index:100;display:none;background:transparent}
+/* on CrazyGames the ad slots hold real banners: no placeholder box or label */
+#ads.cg .adslot{border:none;background:transparent}#ads.cg .adslot span{display:none}
+#ads .adslot.nofill{visibility:hidden}
