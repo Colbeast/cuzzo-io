@@ -38,8 +38,11 @@ function botName(){const R=a=>a[Math.random()*a.length|0],N=(a,b)=>a+(Math.rando
   if(n.length>12)continue;n='BOT '+n;if(!used.has(n.toLowerCase())&&!hasBadWords(n))return n}
  return 'BOT '+R(NS)+N(10,99)}
 function botAdd(o){o=o||{};const id='B'+(++BOTS.n),p=addP(id,o.name||botName());
- const w=o.w!=null?o.w:(gm===0?[1,1,2,2,3,0]:[1,1,1,2,2,17,18,3])[Math.random()*(gm===0?6:8)|0];
- p.sk=o.sk!=null?o.sk:(Math.random()*SK.length|0);p.fac=o.fac;p.skill=o.skill!=null?o.skill:.3+Math.random()*.35;p.bw=w;p.maxhp=o.hp||100;
+ // two guns: free-for-all bots use a class (primary + secondary), Battle Royale / Squads bots carry a long-range
+ // gun and a close-range one; campaign characters keep the one they're given
+ let wl;if(o.w!=null)wl=[o.w];else if(gm===0&&typeof CLASSES!=='undefined'){const C=CLASSES[Math.random()*CLASSES.length|0];wl=[C.w[0],C.w[1]]}
+ else wl=[[1,1,3,17][Math.random()*4|0],[2,18][Math.random()*2|0]];const w=wl[0];
+ p.sk=o.sk!=null?o.sk:(Math.random()*SK.length|0);p.fac=o.fac;p.skill=o.skill!=null?o.skill:.3+Math.random()*.35;p.bw=w;p.wl=wl;p.maxhp=o.hp||100;p.gc=Math.random()<.6?(Math.random()*11|0):0;
  p.boss=!!o.boss;p.sc=o.scale||1;p.respawn=o.respawn!==false;p.guard=o.guard||null;p.spawnAt=o.spawn||null;p.tag=o.tag||'';p.hunt=o.hunt||null;p.tm=o.tm|0;p.dropAt=o.drop||0;p.prefer=o.prefer||null;p.follow=o.follow||null;p.dmgK=o.dmgK||1;p.spdK=o.spdK||1;
  if(p.sc!==1){p.R.g.scale.setScalar(p.sc)}
  BOTS.list.push(p);botRespawn(p,true);if(isHost&&typeof lob==='function'&&!BOTS.camp)lob();return p}
@@ -53,9 +56,9 @@ function botSpawnPoint(p){
  const others=[me,...Object.values(players)].filter(e=>e!==p&&entAlive(e)).map(e=>{const q=entPos(e);return[q.x,q.z]});
  let best=spawns[0],bd=-1;for(let k=0;k<8;k++){const s=spawns[Math.random()*spawns.length|0];let m=1e9;for(const o of others)m=Math.min(m,Math.hypot(o[0]-s[0],o[1]-s[1]));if(m>bd){bd=m;best=s}}
  return safeSpot(best[0],best[1])}
-function botRespawn(p,first){const s=botSpawnPoint(p);const r=p.rt;Object.assign(r,{x:s[0],y:Hf(s[0],s[1]),z:s[1],yaw:Math.random()*6.283,pitch:0,hp:p.maxhp,mh:p.maxhp,w:p.bw,bs:0,ck:0,inv:0,sc:p.sc});
+function botRespawn(p,first){if(p.wl)p.bw=p.wl[0];const s=botSpawnPoint(p);const r=p.rt;Object.assign(r,{x:s[0],y:Hf(s[0],s[1]),z:s[1],yaw:Math.random()*6.283,pitch:0,hp:p.maxhp,mh:p.maxhp,w:p.bw,bs:0,ck:0,inv:0,sc:p.sc});
  r.y=groundAt(r.x,r.z,r.y+.5);p.dead=0;p.seen=1;p.R.g.position.set(r.x,r.y,r.z);
- p.ai={vy:0,cd:.6,ammo:(WP[p.bw]&&WP[p.bw].mag)||30,rl:0,burst:0,strafe:Math.random()<.5?-1:1,st:1,tgt:null,tgtT:0,seeT:0,seen:0,wander:0,wa:0,pt:0,wp:null,wpT:0,jump:2+Math.random()*3,grace:first?1:1.5,lastSeen:null,hurtT:0,aimYaw:r.yaw}}
+ p.ai={vy:0,cd:.6,ammo:(WP[p.bw]&&WP[p.bw].mag)||30,rl:0,burst:0,strafe:Math.random()<.5?-1:1,st:1,tgt:null,tgtT:0,seeT:0,seen:0,wander:0,wa:0,pt:0,wp:null,wpT:0,jump:2+Math.random()*3,grace:first?1:1.5,lastSeen:null,hurtT:0,aimYaw:r.yaw,amm:{},calm:0}}
 // ---------- damage ----------
 // from: who did it (player id, bot id or 'me' id). Returns true if it killed.
 function botHurt(p,d,hs,from){if(!p||p.dead||!isHost)return false;d=+d;if(!(d>0))return false;d=Math.min(d,250);
@@ -102,11 +105,19 @@ function botThink(p,dt){const r=p.rt,A=p.ai,W=BOTW[p.bw]||BOTW[1],Wp=WP[p.bw];if
  // pick a target a few times a second: the closest enemy it can see, sticking with the current one for a bit
  A.tgtT-=dt;if(A.tgtT<=0){A.tgtT=.25+Math.random()*.2;const L=botTargets(p);let best=null,bd=1e9;
   for(const t of L){const q=entPos(t),dd=Math.hypot(q.x-r.x,q.z-r.z);if(dd>95)continue;const fresh=t===me?(performance.now()-(me.spT||0))<1500:false;if(fresh)continue;
-   const thp=t===me?me.hp:(t.rt.hp||100),sc=dd*(.7+.3*Math.min(1,thp/100))*(t===A.tgt?.7:1)*(t===me&&!BOTS.camp?.92:1)*(p.prefer&&t===p.prefer?.45:1);if(sc<bd&&(t===A.tgt&&performance.now()-(A.seenT||0)<1200?canSee(p,t,95):canSeeFov(p,t,95))){bd=sc;best=t}}
-  if(best){A.tgt=best;A.seenT=performance.now();const q=entPos(best);A.lastSeen=[q.x,q.z];A.inv=null}else if(A.tgt&&(!entAlive(A.tgt)||performance.now()-(A.seenT||0)>1500)){A.tgt=null;A.searchT=3}}
+   const thp=t===me?me.hp:(t.rt.hp||100),sc=dd*(.7+.3*Math.min(1,thp/100))*(t===A.tgt?.7:1)*(t===me&&!BOTS.camp?.92:1)*(p.prefer&&t===p.prefer?.45:1);if(sc<bd&&(t===A.tgt&&performance.now()-(A.seenT||0)<3000?canSee(p,t,95):canSeeFov(p,t,95))){bd=sc;best=t}}
+  if(best){A.tgt=best;A.seenT=performance.now();const q=entPos(best);A.lastSeen=[q.x,q.z];A.inv=null}
+  else if(A.tgt&&(!entAlive(A.tgt)||performance.now()-(A.seenT||0)>3000)){A.tgt=null;A.searchT=3}
+  else if(A.tgt&&!A.predicted&&performance.now()-(A.seenT||0)>700){A.predicted=1;const v=VEL.get(A.tgt);if(v&&A.lastSeen)A.lastSeen=[A.lastSeen[0]+v[0]*1.2,A.lastSeen[1]+v[1]*1.2]}
+  if(best)A.predicted=0}
  const t=A.tgt&&entAlive(A.tgt)?A.tgt:null;let sees=0,dist=1e9,dx=0,dz=0;
  if(t){const q=entPos(t);dx=q.x-r.x;dz=q.z-r.z;dist=Math.hypot(dx,dz);sees=(performance.now()-(A.seenT||0))<700?dist:0}
- A.seen=sees?Math.min(A.seen+dt,5):Math.max(0,A.seen-dt*2);
+ A.seen=sees?Math.min(A.seen+dt,5):Math.max(0,A.seen-dt*.6);
+ A.calm=t||A.hurtT>0?0:A.calm+dt;
+ // out of a fight for a while: patch up and reload
+ if(!BOTS.camp&&A.calm>5&&r.hp<p.maxhp)r.hp=Math.min(p.maxhp,r.hp+8*dt);
+ if(A.calm>2.5&&p.wl&&p.wl.length>1&&p.bw!==p.wl[0])botSwap(p,p.wl[0]);
+ if(A.calm>2&&!A.rl&&A.ammo<(WP[p.bw].mag||1)*.5){A.rl=WP[p.bw].rl}
  // ---- movement ----
  let mx=0,mz=0;const ux=dist<1e8&&dist>.01?dx/dist:0,uz=dist<1e8&&dist>.01?dz/dist:0;let goal=null,look=null;
  if(A.wander>0){A.wander-=dt;mx=Math.cos(A.wa);mz=Math.sin(A.wa)}
@@ -140,12 +151,16 @@ function botThink(p,dt){const r=p.rt,A=p.ai,W=BOTW[p.bw]||BOTW[1],Wp=WP[p.bw];if
  A.vy-=(MAPS[mapIdx].grav||18)*dt;r.y+=A.vy*dt;const g=groundAt(r.x,r.z,Math.max(r.y,r.y-A.vy*dt)+.55);if(r.y<=g){r.y=g;A.vy=0}
  if(r.y<-60){botRespawn(p);return}
  // ---- aim: turn smoothly toward the target ----
+ if(look==null&&!sees&&A.lastSeen&&Math.hypot(A.lastSeen[0]-r.x,A.lastSeen[1]-r.z)>2)look=Math.atan2(-(A.lastSeen[0]-r.x),-(A.lastSeen[1]-r.z));
  let want=look!=null?look:A.alert>0&&A.look!=null&&!t?A.look:ml>0?Math.atan2(-mx,-mz):r.yaw,wp=0;if(t&&sees){const q=entPos(t);want=Math.atan2(-dx,-dz);wp=Math.atan2(q.y+1.2-(r.y+1.62*p.sc),dist)}
  const turn=(sees?7:5)*dt*(.6+p.skill*.6)*(BOTS.camp?1:.7);const dy=bAng(r.yaw,want);r.yaw+=Math.max(-turn,Math.min(turn,dy));r.pitch+=(wp-r.pitch)*Math.min(1,dt*8);
  // ---- shooting ----
  A.cvT=(A.cvT||0)-dt;if(t&&sees&&!A.cover&&A.cvT<=0&&((A.hurtT>0&&r.hp<55)||A.rl>0||(r.hp<30&&dist<30))){A.cvT=1.5;const c=botCover(p,t);if(c){A.cover=c;A.coverT=A.rl>0?Math.max(1.5,A.rl+.3):r.hp<30?4:2.2}}
- A.cd-=dt;if(A.rl>0){A.rl-=dt;if(A.rl<=0)A.ammo=Wp.mag;return}
- if(!t||!sees||A.grace>0||ending||A.cd>0||dist>W.max*1.6)return;
+ if(t&&sees&&p.wl&&p.wl.length>1){const[a,b]=p.wl,am=w=>w===p.bw?A.ammo:(A.amm[w]??WP[w].mag);
+  if(gm===0){if((A.ammo<=0||A.rl>0)&&p.bw===a&&am(b)>0)botSwap(p,b)}// out of ammo: secondary is quicker than reloading
+  else{const want=dist<11?b:a;if(want!==p.bw&&am(want)>0&&!(A.rl>0&&p.bw===want))botSwap(p,want)}}// close range: shotgun / SMG
+ A.cd-=dt;if(A.rl>0){A.rl-=dt;if(A.rl<=0)A.ammo=WP[p.bw].mag;return}
+ if(!t||!sees||A.grace>0||ending||A.cd>0||dist>W.max*(ELIM()?2.4:1.6))return;
  const react=BOTS.camp?.4+(1-p.skill)*.55:.7+(1-p.skill)*.7;if(A.seen<react||Math.abs(bAng(r.yaw,want))>.25)return;
  if(p.bw===1||p.bw===18){if(A.burst<=0){A.burst=BOTS.camp?3+(Math.random()*6|0):2+(Math.random()*4|0);A.cd=BOTS.camp?.3+Math.random()*.6:.5+Math.random()*.8;return}A.burst--}
  A.cd=Wp.r*W.rate*(BOTS.camp?1.05:1.3);A.ammo--;if(A.ammo<=0){A.rl=Wp.rl*1.2;A.burst=0}
@@ -169,6 +184,7 @@ function botDeal(p,t,d,hs){if(!entAlive(t))return;
  if(t===me){dmg({d,f:p.id,hs})}
  else if(isBot(t))botHurt(t,d,hs,p.id);
  else{const m={t:'h',to:t.id,d,hs,f:p.id};links.forEach(l=>l.pid===t.id&&l.open&&l.send(m))}}
+function botSwap(p,w){const A=p.ai;if(!A||w===p.bw)return;A.amm[p.bw]=A.ammo;p.bw=w;p.rt.w=w;A.ammo=A.amm[w]??WP[w].mag;A.rl=0;A.burst=0;A.cd=Math.max(A.cd,.35)}
 // a nearby spot the target can't see (behind a wall, a house, a rock), reachable on the ground
 function botCover(p,t){if(!NAV.ready)return null;const r=p.rt,q=entPos(t),eye=new V(q.x,q.y+1.6,q.z);let best=null,bd=1e9;
  for(let k=0;k<12;k++){const a=k/12*6.283;for(const R of [3,5,7.5]){const x=r.x+Math.cos(a)*R,z=r.z+Math.sin(a)*R,c=navCell(x,z);if(c<0||!NAV.ok[c]||Math.abs(NAV.h[c]-r.y)>1)continue;
@@ -199,6 +215,7 @@ function botTick(dt){if(!isHost){return}
   else if(BOTS.list.length<want){BOTS.addT-=dt;if(BOTS.addT<=0){BOTS.addT=BOTS.list.length?1.2:.4;const b=botAdd({});feed(b.name+' joined')}}else BOTS.addT=Math.min(BOTS.addT,.4)}
  if(!go)return;if(typeof navBuild==='function'&&BOTS.list.length)navBuild(3);if(BOTS.camp&&(BOTS.camp.paused||BOTS.camp.over))return;
  velTrack(dt);
+ BOTS.stepT=(BOTS.stepT||0)-dt;if(BOTS.stepT<=0&&!BOTS.camp){BOTS.stepT=.5;for(const e of [me,...Object.values(players).filter(q=>!isBot(q))]){if(!entAlive(e))continue;const v=VEL.get(e);if(!v)continue;const sp=Math.hypot(v[0],v[1]);if(sp>4.5&&!(e===me&&me.ck)){const q=entPos(e);botNoise(q.x,q.z,sp>9?20:11,e)}}}
  for(const p of BOTS.list){if(p.dead||ending)continue;try{botThink(p,dt)}catch(e){console.error(e)}}
  // tell everyone where the bots are (20 times a second, like a player)
  botNetT+=dt;if(botNetT>.05&&links.length&&!BOTS.camp){botNetT=0;for(const p of BOTS.list){const r=p.rt,m={t:'p',f:p.id,tm:p.tm|0,x:+r.x.toFixed(2),y:+r.y.toFixed(2),z:+r.z.toFixed(2),yaw:+r.yaw.toFixed(3),pitch:+r.pitch.toFixed(3),w:r.w,hp:Math.round(r.hp),mh:p.maxhp,bs:r.bs?1:0,ck:0,inv:0,sh:0,sp:0,gl:0,cr:0,ns:0};links.forEach(l=>l.pid&&l.open&&l.send(m))}}}

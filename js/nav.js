@@ -8,8 +8,8 @@ function navBlockedAt(x,z,y){if(BND>0&&x*x+z*z>BND*BND)return true;if(RBX>0&&(Ma
  for(const b of near(x,z)){if(b.t)continue;if(fo(b,x,z)&&b[4]>y+.55&&b[5]<y+1.8)return true}return false}
 function navReset(){NAV.ready=false;NAV.world=world;NAV.phase=0;NAV.bi=0;
  let a=1e9,b=-1e9,c=1e9,d=-1e9;for(const s of spawns){a=Math.min(a,s[0]);b=Math.max(b,s[0]);c=Math.min(c,s[1]);d=Math.max(d,s[1])}
- let E=Math.max(40,Math.max(Math.abs(a),Math.abs(b),Math.abs(c),Math.abs(d))+35);if(BND>0)E=Math.min(E,BND+2);if(RBX>0)E=Math.min(E,Math.max(RBX,RBZ)+2);E=Math.min(E,300);
- NAV.cs=E>130?2.4:1.6;NAV.x0=-E;NAV.z0=-E;NAV.nx=NAV.nz=Math.ceil(2*E/NAV.cs);const N=NAV.nx*NAV.nz;
+ let E=Math.max(40,Math.max(Math.abs(a),Math.abs(b),Math.abs(c),Math.abs(d))+35);if(BND>0)E=Math.min(E,BND+2);if(RBX>0)E=Math.min(E,Math.max(RBX,RBZ)+2);E=Math.min(E,480);
+ NAV.cs=E>300?3.2:E>130?2.4:1.6;NAV.x0=-E;NAV.z0=-E;NAV.nx=NAV.nz=Math.ceil(2*E/NAV.cs);const N=NAV.nx*NAV.nz;
  NAV.h=new Float32Array(N);NAV.ok=new Uint8Array(N);NAV.m=new Uint8Array(N);NAV.g=new Float32Array(N);NAV.from=new Int32Array(N);NAV.stamp=new Uint32Array(N);NAV.cl=new Uint32Array(N);NAV.heap=[]}
 const navX=i=>NAV.x0+(i%NAV.nx+.5)*NAV.cs,navZ=i=>NAV.z0+(Math.floor(i/NAV.nx)+.5)*NAV.cs;
 const navCell=(x,z)=>{const i=Math.floor((x-NAV.x0)/NAV.cs),j=Math.floor((z-NAV.z0)/NAV.cs);return i<0||j<0||i>=NAV.nx||j>=NAV.nz?-1:j*NAV.nx+i};

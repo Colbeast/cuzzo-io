@@ -516,3 +516,4 @@ body.touch #mms{display:none}
 @media (max-width:700px),(max-height:520px){#gcl{grid-template-columns:repeat(4,1fr)}#gcbox .cbx{padding:10px}}
 .pbtns{flex-wrap:wrap}
 .pbtns{align-items:stretch}.pbtns button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;font-size:13px;letter-spacing:1px}
+#plist .bt{font-size:8.5px;line-height:12px;padding:0 3px;margin-left:4px}#plist .kick{margin-left:4px;cursor:pointer}

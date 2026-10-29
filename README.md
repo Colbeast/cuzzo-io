@@ -42,6 +42,15 @@ Texture letters: `p` plaster, `b` brick, `w` wood siding, `x` crate, `m` corruga
 `o` door planks, `r` rock, `e` glow, `z` thatch, `2` coral stone, `4` dock planks, `5` ice blocks, plus newer floor/road/siding textures
 (see `tools/build_textures.py` for the full list).
 
+## v7.6: much smarter Battle Royale bots, menu character fixed
+- **Fixed: the 3D character on the menu was invisible** (only the stand showed). It now shows your outfit and gun skin, facing you.
+- **Bots keep track of who they're fighting:** once they've seen someone they keep watching them (even out of the corner of their eye) for 3 seconds, and when they lose sight they head to where that person was going, looking that way, instead of wandering off. Before, two bots could circle each other without ever shooting.
+- **Two guns:** Battle Royale and Squads bots carry a long-range gun (rifle, sniper or heavy pistol) and a close-range one (shotgun or SMG) and switch depending on distance. Free-for-all bots use a class like you (primary + secondary) and pull out the secondary when the primary runs dry.
+- **Longer range** in Battle Royale and Squads, so they actually shoot back across open ground.
+- **They heal and reload** after a fight when nobody's shooting at them.
+- **They hear running footsteps** close by (sneaking/crouching is silent).
+- Bots have random gun skins, and the path-finding grid now covers the biggest maps.
+
 ## v7.5: bot count, gun skins, 5 new outfits, smarter bots
 - **Choose how many bots.** In the lobby the host sets the number of bots (0-7) with - / + for the selected mode: free-for-all, Battle Royale and Squads each remember their own number. Bots join the lobby right away, vote for maps, and play the match; they still make room when real players need the places. Kicking a bot lowers the number. Play now uses your saved numbers (4 / 5 / 5 to start).
 - **Bots are tagged again:** names start with "BOT" and the lobby list shows a BOT label.
