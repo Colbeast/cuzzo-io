@@ -3,8 +3,6 @@
 <meta name="theme-color" content="#0b0c0d"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-fullscreen">
 <link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="assets/icon-192.png"><link rel="apple-touch-icon" href="assets/icon-192.png">
 <title>Cuzzo io</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Permanent+Marker&family=Oswald:wght@500;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js" async></script>
 </head><body>
@@ -24,27 +22,33 @@
 
 <div id="cgblock"></div><div id="clickplay"><div><b>The match has started</b><span>Click anywhere to play</span></div></div><div id="menu"><div id="box">
 <div class="brand"><h1>CUZZO<span class="logotag">io</span></h1><button id="ctlb" class="alt">&#9881; Settings</button></div>
-<p class="sub">Arena shooter &middot; free-for-all, battle royale &amp; squads &middot; up to 8 survivors</p>
+<p class="sub">Arena shooter &middot; online matches, battle royale, squads &amp; a story campaign</p>
 <div id="s-main" class="step on">
- <div class="card row"><img id="skpic" class="pic"><div style="flex:1"><h2>Survivor name</h2><input id="nm" class="wide" maxlength="16" placeholder="Player"><button id="chs1" class="alt" style="margin-top:8px;width:100%">Change outfit</button></div></div>
- <button id="qplay" class="big">&#9654; Play now</button>
+ <div class="card prof"><div class="pv"><img id="skpic" class="pic"><canvas id="pvc" width="220" height="260"></canvas></div><div class="pinfo"><h2>Survivor name</h2><input id="nm" class="wide" maxlength="16" placeholder="Player">
+  <div class="plvl"><b id="plv">1</b><div class="pxw"><div class="pxb"><i id="pxpf"></i></div><small id="pxpt">0 / 350 XP</small></div></div><small id="pnext" class="pnext"></small>
+  <div class="pbtns"><button id="chs1" class="alt">Outfit</button></div></div></div>
+ <h2>Play now</h2>
+ <div class="playgrid"><button id="qplay" class="big qp"><span>&#9654; Free-for-all</span><small>First to 15 &middot; respawns</small></button><button id="qpbr" class="big qp"><span>&#9654; Battle Royale</span><small>Last one standing</small></button>
+ <button id="qpsq" class="big qp"><span>&#9654; Squads</span><small>4 v 4 &middot; drivable cars</small></button><button id="campb" class="big camp"><span>&#9733; Campaign</span><small id="campst">Story mode &middot; play offline</small></button></div>
  <h2>Play online</h2>
  <div class="row"><button id="host" class="big">Host server</button><span class="or">or</span><input id="code" maxlength="4" placeholder="CODE" autocomplete="off"><button id="join" class="alt">Join</button></div>
  <div id="rbwrap" style="display:none"><h2>Rooms <small id="rbst"></small></h2><div id="rooms"></div></div>
+ <div id="chal"><h2>Daily challenges <small id="chalt"></small></h2><div id="chl"></div></div>
  <h2>Other</h2>
  <div class="row"><button id="prac" class="alt" style="display:none">Practice</button><button id="mh" class="alt">Manual host</button><button id="mj" class="alt">Manual join</button></div>
- <p class="fine">Manual connect is a 2-player fallback for networks that block matchmaking. Online play connects you directly to other players, who can see your name and chat messages.</p>
+ <p class="fine">Manual connect is a 2-player fallback for networks that block matchmaking. Online play connects you directly to other players, who can see your name and chat messages. <a href="privacy.html" target="_blank" rel="noopener">Privacy</a></p>
 </div>
 <div id="s-lobby" class="step">
  <div id="codebar" class="row card" style="justify-content:space-between"><div><h2 style="margin:0">Server code</h2><div id="big">....</div></div><div id="gmt">Share the code with friends<br>Free-for-all &middot; first to 15 kills</div></div>
  <div id="privrow" style="display:none"><div class="row"><button id="rpub">&#127760; Public</button><button id="rpriv" class="alt">&#128274; Private</button></div><p class="fine" id="privh"></p></div>
  <h2>Players</h2><div id="plist"></div>
  <h2>Game mode</h2><div id="modes"><div class="tile on" id="m-ffa"><b>Free-for-all</b><span>First to 15 kills &middot; instant respawns</span></div><div class="tile" id="m-br"><b>Battle Royale</b><span>Huge map &middot; closing storm &middot; last one alive</span></div><div class="tile" id="m-sq"><b>Squads</b><span>2 teams of 4 &middot; drivable cars &middot; Pine Lake or Sunset Bay</span></div></div>
- <div id="vwrap"><h2>Vote for the map</h2><div id="vote"></div><p class="fine">Everyone in the lobby gets one vote. The map with the most votes is played when the host starts.</p></div><div id="mc"><img id="mimg"><div style="flex:1"><h2 style="margin:0 0 4px">Map</h2><b id="mn"></b><br><span id="md"></span><br><small id="mpick" style="color:var(--ac)"></small><div class="row" style="margin-top:12px"><button id="chmap" class="alt">Choose map</button><button id="vmode" class="alt">Map choice</button><button id="chs2" class="alt">Change outfit</button></div></div></div>
+ <div id="vwrap"><h2>Vote for the map</h2><div id="vote"></div><p class="fine">Everyone in the lobby gets one vote. The map with the most votes is played when the host starts.</p></div><div id="mc"><img id="mimg"><div style="flex:1"><h2 style="margin:0 0 4px">Map</h2><b id="mn"></b><br><span id="md"></span><br><small id="mpick" style="color:var(--ac)"></small><div class="row" style="margin-top:12px"><button id="chmap" class="alt">Choose map</button><button id="vmode" class="alt">Map choice</button><button id="botsb" class="alt">Bots</button><button id="chs2" class="alt">Change outfit</button></div></div></div>
  <button id="go">Start match</button><button id="leave" class="alt" style="width:100%;margin-top:8px">Leave</button>
 </div>
+<div id="s-camp" class="step"></div>
 <div id="s-man" class="step"><p id="mt"></p><textarea id="m1" readonly></textarea><p id="mt2"></p><textarea id="m2"></textarea><div class="row" style="margin-top:8px"><button id="mb">Connect</button><button id="mback" class="alt">Back</button></div></div>
-<p id="status">Press Play now to jump into a match, host your own server, or join with a code.</p>
+<p id="status">Pick a mode under Play now to jump straight into a match, play the campaign, host your own server, or join with a code.</p>
 <div id="keys"></div>
 </div>
 <!-- ad space (menus only, never during a match). Your ad network's code fills these boxes: see js/ads.js -->
@@ -61,10 +65,17 @@
 <script src="js/filter.js"></script>
 <script src="js/game.js"></script>
 <script src="js/extras.js"></script>
+<script src="js/guns.js"></script>
 <script src="js/loot.js"></script>
-<script src="js/bot.js"></script>
+<script src="js/nav.js"></script>
+<script src="js/bots.js"></script>
+<script src="js/juice.js"></script>
 <script src="js/perf.js"></script>
 <script src="js/fx.js"></script>
+<script src="js/progress.js"></script>
+<script src="js/classes.js"></script>
+<script src="js/menu3d.js"></script>
+<script src="js/campaign.js"></script>
 <script src="js/rooms.js"></script>
 <script src="js/ads.js"></script>
 <script src="js/crazygames.js"></script>

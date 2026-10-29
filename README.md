@@ -1,6 +1,6 @@
 # Cuzzo io
 
-Open `index.html` in Chrome (double-click works). Online play needs an internet connection; if online play is blocked, Play now gives you a match against the bot instead.
+Open `index.html` in Chrome (double-click works). Online play needs an internet connection; the story campaign and bot matches work offline.
 
 ## What's in the folder
 
@@ -9,11 +9,21 @@ index.html              page markup (menu + HUD)
 css/style.css           all UI styling
 js/game.js              the game (maps, players, weapons, netcode, rendering)
 js/extras.js            drivable cars, third-person camera, car and squadmate map markers
+js/guns.js              detailed first-person weapon models
+js/bots.js              bots: fill free-for-all, Battle Royale and Squads matches, and the campaign's enemies, allies and bosses
+js/classes.js           the four free-for-all classes and the class picker
+js/nav.js               walkable grid of the map and A* path finding for bots
+js/juice.js             sound effects, hit/kill feedback, kill streaks, damage direction, death screen, sparks
+js/progress.js          XP, levels, unlockable outfits, daily challenges, match summary (saved in the browser)
+js/menu3d.js            your character in 3D on the main menu
+js/campaign.js          the story campaign: 12 missions in 3 chapters
+assets/fonts/           the game's fonts (bundled, so nothing loads from Google Fonts)
 js/perf.js              graphics quality (Auto / Low / Medium / High) and automatic resolution scaling
 js/mobile.js            touch controls for phones and tablets
 manifest.webmanifest    lets phones "Add to Home Screen" and play full screen in landscape
 js/turn-config.js       address of your TURN Worker (see SERVER_SETUP.md)
 js/rooms.js             public/private room list on the main menu
+privacy.html            plain-English privacy notice, linked from the menu
 server/                 Cloudflare Worker: TURN logins + room list (see SERVER_SETUP.md)
 assets/js/three.min.js  three.js r149 (MIT)
 assets/js/textures.js   textures bundled as data URIs (generated, don't edit)
@@ -30,6 +40,59 @@ Texture letters: `p` plaster, `b` brick, `w` wood siding, `x` crate, `m` corruga
 `c` concrete, `f` ground/grass detail, `g` skyscraper windows, `t` roof shingles,
 `o` door planks, `r` rock, `e` glow, `z` thatch, `2` coral stone, `4` dock planks, `5` ice blocks, plus newer floor/road/siding textures
 (see `tools/build_textures.py` for the full list).
+
+## v7.4: class pick every round, secondaries fixed
+- **Pick your class at the start of every free-for-all round** (and when you join a match): a panel shows the four classes for 10 seconds. Press 1-4 (or tap a card on a phone) to switch straight away with full ammo; Enter or waiting keeps your current class. You can still change class from the menu between rounds (it starts when you respawn).
+- **Fixed: the Glock, Silent pistol and Six-shooter didn't shoot** (they had no bullet set up, so firing stopped with an error). All 12 class weapons were tested hitting a target: Rifle, Glock, Machete, Shotgun, SMG, Hatchet, Sniper, Silent pistol, Knife, Pistol, Six-shooter, Whip.
+
+## v7.3: smarter bots
+- **Path finding.** After a map loads, the host builds a walkable grid of it (a few milliseconds per frame, so nothing freezes) and bots use A* paths to walk around walls, fences, buildings and rocks instead of bumping into them. They cut corners when the way is clear, and jump and re-plan if they get stuck.
+- **Doors.** Bots open closed doors they walk up to.
+- **No more wallhacks.** Bots only see what's in front of them (about 130 degrees) and not through walls. When they lose you, they go to where they last saw you and look around. They hear gunshots (silenced guns much less) and come to check them out, and when they get shot they turn toward where it came from instead of knowing exactly where you are. In Battle Royale they roam inside the safe zone; in the campaign enemies only know roughly where you are.
+- New file: js/nav.js.
+
+## v7.2.1: easier bots, fewer of them
+- Bots react more slowly, aim worse (especially at range), turn slower, fire in shorter bursts and a bit slower, and do 20% less damage to real players. Campaign enemies are a little easier too.
+- Bots no longer fill matches: free-for-all tops up to 5 players, Battle Royale to 6, Squads to 3 v 3. A public lobby gets only 2-3 bots before the match, so there's always room for real players.
+
+## v7.2: bots look like real players
+- Bots get player-style names (like "SwiftHawk64", "mia7494" or "xXRavenXx") instead of "BOT ...", and show up in the lobby player list like everyone else.
+- When you host a public room and wait in the lobby, players (bots) now and then join it, vote for a map, and sometimes leave again, up to 3-6 people. They stay for the match when you press Start. Private rooms only get your friends.
+- The Rooms list counts them too. Bots still make room for real players: one leaves whenever a real player joins.
+
+## v7.1: classes, a Play now button per mode, slower XP
+- **Classes in free-for-all.** Pick one of four classes (Class button on the menu and in the pause menu). During a match the new class starts when you respawn.
+  - Assault: Rifle, Glock, Machete
+  - Breacher: Shotgun, SMG, Hatchet
+  - Marksman: Sniper, Silent pistol, Knife
+  - Gunslinger: Pistol, Six-shooter, Whip, and 8% faster running
+  Three new melee weapons (Knife, Machete, Hatchet). Battle Royale keeps its loot and Squads keeps its four guns.
+- **Play now for every mode:** Free-for-all, Battle Royale and Squads each have their own button. Free-for-all joins a running match; Battle Royale and Squads join a public lobby that's waiting to start. If there's nothing to join, a new public match starts right away.
+- **Bots in Battle Royale and Squads.** Battle Royale matches are filled to 8 players (bots land on the island while the bus flies, run from the storm and get hurt by it). Squads fill both teams to 4. Eliminated bots stay out until the next match.
+- **XP is harder to get:** each level needs more XP (500 for level 2, then 175 more per level), and eliminations, medals, matches, wins, challenges, missions and stars all give less.
+
+## v7.0: bots, campaign, progression and a lot more polish
+- **Bots.** Free-for-all matches are filled up to 6 players with bots (named "BOT ..."), so Play now never drops you into an empty match. A bot leaves every time a real player joins. Bots move, strafe, jump, take cover behind detours, pick targets and fight each other too. The host can switch them off in the lobby (Bots: On/Off).
+- **Story campaign.** 12 offline missions in 3 chapters ("Cuzzo City"): eliminate, collect, survive, defend an ally, capture zones and three boss fights (Toasty, Captain Saltbeard, BOLT-9000). Story scenes before and after every mission, radio messages during them, objective markers on screen, 3 stars per mission (finish, die once at most, a mission goal) and best times. Bosses unlock their outfits.
+- **Progression.** XP for eliminations, headshots, streaks, matches, wins, missions and stars. 50 levels. Outfits unlock as you level up (Survivor, Curly, Martin and Chef are free). Three daily challenges. A match summary with the XP you earned. Everything is saved in the browser, and with CrazyGames' cloud save when the player is logged in. Your name and outfit are remembered.
+- **Game feel.** New sounds for every gun (made in code, no audio files), hit and headshot sounds, a kill sound, footsteps and landings. Hit markers that pop, a red X on eliminations, "ELIMINATED" pop-ups with XP, multi-kill and streak medals (DOUBLE KILL, KILLING SPREE...), a red marker showing where damage came from, a low-health warning, screen shake, sparks where bullets land, a brighter muzzle flash, weapon sway and a slight lean when strafing. A kill feed with icons.
+- **Death screen.** Shows who got you, with what, and how much health they had left, while the camera looks at them, then you respawn after about 3 seconds.
+- **First-person guns.** New detailed models for the pistol, rifle, shotgun, sniper and the other guns.
+- **Menu.** Your character in 3D (drag to turn it), level badge and XP bar, the next outfit to unlock, a Campaign button next to Play now, and the daily challenges. Fonts are bundled with the game.
+
+## v6.6.1: invites follow CrazyGames' multiplayer rules
+- The CrazyGames invite button and the "Copy invite link" button are shown whenever your room can be joined: in the lobby, and during free-for-all matches (people can join those halfway). They hide when the room is full, between rounds, and while a Battle Royale or Squads match is running.
+- Everyone in the room can copy the invite link, not just the host (the button is under the room code).
+
+## v6.6: no swearing or slurs anywhere
+- Chat messages with swear words or slurs aren't sent (you see "Message not sent"), and names with them are refused (the name box turns red and you play as "Player").
+- Catches disguised spellings too: f*ck, sh1t, a$$, fuuuck, f.u.c.k, "f u c k", "fu ck", accented or look-alike letters from other alphabets, full-width letters and hidden invisible characters.
+- Applies everywhere players' text shows up: chat, player names (including CrazyGames usernames), room names in the Rooms list, and the random 4-letter room codes (codes that would spell something rude are never used).
+- Anything that still arrives from a modified game is masked (***) or renamed to "Player" on your screen.
+- Tested against every word in a 370,000-word English dictionary so normal words (assassin, class, facility, Scunthorpe...) aren't blocked. Mild words (damn, hell, crap) are allowed.
+
+## v6.5.1: privacy notice
+- New privacy.html page (what other players see, what the server keeps, what's saved on your device), linked as "Privacy" in the menu. CrazyGames asks for a notice like this when a game handles data beyond their SDK.
 
 ## v6.5: Play now is matchmaking
 - **Play now** joins a public free-for-all match that's already running and has space. If there isn't one, it opens a new public free-for-all match and starts it right away; it shows in the Rooms list as "in a match", so the next person who presses Play now joins you.

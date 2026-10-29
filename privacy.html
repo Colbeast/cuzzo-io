@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cuzzo io - Privacy</title>
+<style>
+:root{--bg:#0f1214;--pn:#181c20;--ln:#ffffff1c;--ac:#f0b23c;--tx:#e6e4de;--dim:#a3a49f}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 "Roboto Condensed","Segoe UI",Arial,sans-serif}
+main{max-width:760px;margin:0 auto;padding:32px 20px 60px}
+h1{font:400 40px/1.1 Impact,"Arial Narrow",sans-serif;letter-spacing:3px;margin:0 0 4px;color:#fff}
+h1 span{color:var(--ac);font-size:20px;letter-spacing:1px;margin-left:6px}
+h2{font:600 18px "Arial Narrow",Arial,sans-serif;letter-spacing:2px;text-transform:uppercase;color:var(--ac);margin:30px 0 8px}
+p,li{color:var(--tx)}ul{padding-left:22px}li{margin:4px 0}
+.date{color:var(--dim);margin:0 0 20px}
+.box{background:var(--pn);border:1px solid var(--ln);border-left:3px solid var(--ac);padding:12px 16px;margin:16px 0}
+a{color:var(--ac)}
+</style></head><body><main>
+<h1>CUZZO<span>io</span></h1>
+<p class="date">Privacy notice &middot; last updated October 29, 2026</p>
+
+<div class="box"><b>The short version:</b> Cuzzo io has no accounts, no tracking and no ads of its own, and it doesn't keep any
+information about you. When you play online, other players see your name, what you type in chat, and how your character
+moves. To connect you, their browsers can also see your IP address.</div>
+
+<h2>What other players see</h2>
+<ul>
+<li><b>Your name</b>: what you typed in the name box, or your CrazyGames username if you're logged in to CrazyGames.</li>
+<li><b>Your skin, your position and actions in the match</b>, and your kills and deaths.</li>
+<li><b>Chat messages</b> you send. A filter hides swear words and slurs. Chat isn't saved anywhere; it disappears from the
+screen after a few seconds.</li>
+<li><b>Your IP address.</b> Online matches connect players' browsers directly to each other (peer-to-peer), and that kind of
+connection lets the other players' devices see your IP address. It's needed for the connection to work.</li>
+</ul>
+
+<h2>Our server</h2>
+<p>The game uses a small server (run on Cloudflare) for two things:</p>
+<ul>
+<li><b>The Rooms list.</b> When you host a room, the server keeps its name (your name + "'s room"), game mode, map, player
+count, whether a match is running, and whether it's public or private. A private room's code is never shown to other
+players. A room is deleted as soon as the host leaves, or within 75 seconds if they just close the game.</li>
+<li><b>The relay.</b> If two players can't connect directly (common on phone data and school networks), their match traffic
+is passed through Cloudflare's relay service instead.</li>
+</ul>
+<p>The server sees your IP address while it answers you, only to stop spam (for example, at most 3 rooms per network). We don't
+save or log it. Cloudflare runs the computers this happens on, and it handles network data under its own
+<a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">privacy policy</a>.</p>
+
+<h2>Matchmaking and game files</h2>
+<ul>
+<li>To find each other, players' browsers briefly exchange connection details through public matchmaking relays (open-source
+services that pass short messages between browsers). These include the room code and the network details needed to connect.</li>
+<li>The game loads its multiplayer library from a public file server (jsDelivr). Like any website you visit, it sees your IP
+address when your browser downloads the file. Everything else, fonts included, comes with the game.</li>
+</ul>
+
+<h2>Saved on your device</h2>
+<p>Your name, your outfit, your progress (level, XP, unlocked outfits, daily challenges, campaign stars and best times, and simple
+totals like eliminations and wins), your free-for-all class and your settings (controls, sensitivity, graphics quality, bots on or off, and your
+Public/Private choice for hosting) are saved in your own browser so they're still there next time. Clearing your browser data
+removes them. Bots are played by your own computer; nothing about them is sent anywhere except to the players in your match.</p>
+
+<h2>On CrazyGames</h2>
+<p>When you play on CrazyGames, CrazyGames shows the ads, handles logins and provides your username, under the
+<a href="https://www.crazygames.com/privacy-policy" target="_blank" rel="noopener">CrazyGames privacy policy</a>.
+The game reads your username and CrazyGames' mute and chat settings, and it also gives your saved progress (the same list as
+above) to CrazyGames' save service so it follows your CrazyGames account to other devices.</p>
+
+<h2>What we don't do</h2>
+<ul>
+<li>No accounts, passwords or emails.</li>
+<li>No tracking, analytics or advertising cookies of our own.</li>
+<li>We don't store, sell or share any information about you.</li>
+</ul>
+
+<h2>Age</h2>
+<p>Cuzzo io is made for players aged 13 and up.</p>
+
+<h2>Questions</h2>
+<p>If you have a question about this notice, open an issue on the game's
+<a href="https://github.com/Colbeast/cuzzo-io/issues" target="_blank" rel="noopener">GitHub page</a>.
+If anything here changes, we'll update this page and the date at the top.</p>
+</main></body></html>

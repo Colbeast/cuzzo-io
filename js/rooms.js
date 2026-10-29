@@ -10,11 +10,12 @@ const post=(path,data)=>fetch(base+path,{method:'POST',body:JSON.stringify(data)
 
 // ---------- host side ----------
 let priv=false;try{priv=localStorage.getItem('cf_priv')==='1'}catch(e){}
+window.roomPrivNow=()=>priv;
 const H={code:null,token:null,sig:'',t:0,busy:false,err:''};
 const myCode=()=>{const c=($('big').textContent||'').trim();return /^[A-HJ-NP-Z2-9]{4}$/.test(c)?c:null};
 const hosting=()=>isHost&&!practice&&!!room&&!!myCode();
 function info(){return{code:myCode(),token:H.token,name:(me.name||'Player')+"'s room",mode:gm,map:MAPS[mapIdx].n,
- players:roster().filter(e=>e.id!=='bot').length,priv,started:!!go}}
+ players:roster().length,priv,started:!!go}}
 function closeRoom(){if(!H.code)return;const b={code:H.code,token:H.token};H.code=null;H.token=null;H.sig='';
  try{navigator.sendBeacon(base+'/rooms/close',new Blob([JSON.stringify(b)],{type:'text/plain'}))}catch(e){post('/rooms/close',b).catch(()=>{})}}
 function hostTick(){
@@ -48,7 +49,7 @@ function render(rooms){list.textContent='';
  if(!rooms.length){list.appendChild(el('div','rbempty','No rooms open right now. Host one!'));return}
  rooms.forEach(r=>{const row=el('div','rb'+(r.priv?' priv':'')+(r.players>=r.max?' full':''));
   row.appendChild(el('span','rbi',r.priv?'\u{1F512}':'\u{1F310}'));
-  const mid=el('div','rbm');mid.appendChild(el('b',null,cleanWords(String(r.name||'Room').slice(0,24))));mid.appendChild(el('small',null,MODES[r.mode]+' · '+(r.map||'?')+' · '+(r.started?'in a match':'in the lobby')));row.appendChild(mid);
+  const mid=el('div','rbm');mid.appendChild(el('b',null,(()=>{const n=String(r.name||'Room').slice(0,24);return hasBadWords(n)?'Room':n})()));mid.appendChild(el('small',null,MODES[r.mode]+' · '+(r.map||'?')+' · '+(r.started?'in a match':'in the lobby')));row.appendChild(mid);
   row.appendChild(el('span','rbp',r.players+'/'+r.max));
   const b=el('button',r.priv?'alt':'',r.players>=r.max?'Full':r.priv?'Code':'Join');b.disabled=r.players>=r.max;
   b.onclick=()=>{if(r.priv||!r.code){$('code').value='';$('code').focus();status('\u{1F512} '+r.name+' is private. Type the 4-letter code the host gave you, then press Join.');return}
