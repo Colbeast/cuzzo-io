@@ -32,52 +32,56 @@ if(typeof chatMsg==='function'){const c0=chatMsg;chatMsg=function(){if(CG.chatOf
 function applySettings(s){if(!s)return;CG.muteSdk=!!s.muteAudio;CG.chatOff=!!s.disableChat;applyMute();
  const L=$('chatlog');if(L)L.style.display=CG.chatOff?'none':'';if(CG.chatOff&&typeof chatOn!=='undefined'&&chatOn&&typeof closeChat==='function')closeChat()}
 
-// ---------- PLAY NOW: one click into an online match (matchmaking) ----------
-// 1. If a public free-for-all room is in the middle of a match and has space, join it (you respawn straight in).
-// 2. Otherwise open a new public free-for-all match and start playing right away. It shows in the Rooms list
-//    as "in a match", so the next person who presses Play now joins you.
-// Free-for-all only, because joining a Battle Royale or Squads match halfway puts you in as a spectator.
-// If online play isn't possible at all on this network, you get an offline match against the bot instead.
+// ---------- PLAY NOW: one click into an online match (matchmaking), one button per mode ----------
+// Free-for-all: join a public free-for-all that's already running and has space (you respawn straight in).
+// Battle Royale / Squads: join a public lobby of that mode that's waiting to start (joining one that has
+// already started would only let you spectate).
+// If there's nothing to join, it opens a new public match of that mode and starts it right away, with bots
+// filling the empty places (js/bots.js); it shows in the Rooms list so the next player can join you.
+// If online play isn't possible at all on this network, you play the same mode offline against bots.
 let qpBusy=false;
-const alone=()=>roster().filter(e=>e.id!=='bot').length<=1;
-function offlineNow(){if(room||go||practice)return;
- $('prac').click();// (hidden) practice setup: free-for-all against the bot on the current arena map
- $('go').click()}
-function hostNow(){if(room||go||practice)return;
- if(typeof rtcOK==='function'&&!rtcOK()){offlineNow();return}
+const alone=()=>roster().filter(e=>!isBot(e)).length<=1;
+const QPB=['qplay','qpbr','qpsq'],MODEN=['free-for-all','Battle Royale','Squads'];
+const qpDisable=v=>QPB.forEach(id=>{const b=$(id);if(b)b.disabled=v});
+function modeMap(mode){if(mode===1){if(!MAPS[mapIdx].br||SQM(MAPS[mapIdx]))loadMap(MAPS[lastBR]&&!SQM(MAPS[lastBR])?lastBR:BRI)}
+ else if(mode===2){if(!SQM(MAPS[mapIdx]))loadMap(SQM(MAPS[lastSQ])?lastSQ:SQI)}else if(MAPS[mapIdx].br)loadMap(lastFFA)}
+function offlineNow(mode){if(room||go||practice)return;mode=mode|0;
+ if(mode===0){$('prac').click();$('go').click();return}
+ practice=true;isHost=true;me.id='h';gm=mode;modeMap(mode);$('big').textContent='SOLO';step('lobby');renderLobby();$('go').disabled=false;$('go').click()}
+function hostNow(mode){if(room||go||practice)return;mode=mode|0;
+ if(typeof rtcOK==='function'&&!rtcOK()){offlineNow(mode);return}
  isHost=true;me.id='h';
- if(gm!==0&&typeof hostMode==='function')hostMode(0);
- if(MAPS[mapIdx].br)loadMap(lastFFA);
- const code=Array.from({length:4},()=>AL[Math.random()*AL.length|0]).join('');
+ if(gm!==mode&&typeof hostMode==='function')hostMode(mode);modeMap(mode);
+ let code;do{code=Array.from({length:4},()=>AL[Math.random()*AL.length|0]).join('')}while(hasBadWords(code));/* never a code that spells something rude */
  $('big').textContent=code;step('lobby');
  if(typeof roomSetPriv==='function')roomSetPriv(false,true);// Play now matches are always public (doesn't change your Host server choice)
  renderLobby();$('go').disabled=false;// the Start button is disabled until the menu knows you're the host
  $('go').click();// starts the match and locks the mouse inside this click, so you're playing immediately
- status('Your public match is open. Anyone who presses Play now will join you.');
- startRoom(code).then(()=>{if(typeof feed==='function')feed('Online: players who press Play now will join your match')})
+ status('Your public '+MODEN[mode]+' match is open. Players who press Play now can join you.');
+ startRoom(code).then(()=>{if(typeof feed==='function')feed('Online: other players can join your match')})
   .catch(e=>{console.error(e);if(room||!go||!isHost)return;
-   // online play is blocked on this network: keep playing, but against the bot so you're not alone
-   practice=true;const b=addP('bot','Practice Bot');b.sk=1;if(typeof botSpawn==='function')botSpawn();
-   status('Online play is blocked on this network, so you\'re playing against the bot.');
-   if(typeof feed==='function')feed('Can\'t go online here - playing against the bot',1)});
+   // online play is blocked on this network: keep playing against bots so you're not alone
+   practice=true;
+   status('Online play is blocked on this network, so you\'re playing against bots.');
+   if(typeof feed==='function')feed('Can\'t go online here - playing against bots',1)});
 }
-async function quickPlay(){if(typeof booted!=='undefined'&&!booted)return;if(room||go||practice||qpBusy)return;
- const btn=$('qplay');let rooms=[];
- if(typeof roomsNow==='function'){qpBusy=true;btn.disabled=true;status('Looking for a match...');
+async function quickPlay(mode){mode=mode|0;if(typeof booted!=='undefined'&&!booted)return;if(room||go||practice||qpBusy)return;
+ let rooms=[];
+ if(typeof roomsNow==='function'){qpBusy=true;qpDisable(true);status('Looking for a '+MODEN[mode]+' match...');
   try{rooms=await roomsNow(2500)}catch(e){rooms=[]}}
- qpBusy=false;btn.disabled=false;
- const pick=rooms.filter(r=>r&&!r.priv&&r.code&&r.mode===0&&r.started&&r.players<r.max).sort((a,b)=>b.players-a.players)[0];
- if(!pick||(typeof rtcOK==='function'&&!rtcOK())){hostNow();return}
- qpBusy=true;btn.disabled=true;status('Joining '+cleanWords(String(pick.name||'a match'))+'...');isHost=false;
- const giveUp=()=>{qpBusy=false;btn.disabled=false;try{leave()}catch(e){}hostNow()};// that host didn't answer: open our own match instead
+ qpBusy=false;qpDisable(false);
+ const pick=rooms.filter(r=>r&&!r.priv&&r.code&&r.mode===mode&&(mode===0?r.started:!r.started)&&r.players<r.max).sort((a,b)=>b.players-a.players)[0];
+ if(!pick||(typeof rtcOK==='function'&&!rtcOK())){hostNow(mode);return}
+ qpBusy=true;qpDisable(true);status('Joining '+cleanWords(String(pick.name||'a match'))+'...');isHost=false;
+ const giveUp=()=>{qpBusy=false;qpDisable(false);try{leave()}catch(e){}hostNow(mode)};// that host didn't answer: open our own match instead
  try{await startRoom(pick.code)}catch(e){giveUp();return}
  const t0=performance.now();
  const tm=setInterval(()=>{
-  if(hostLink){clearInterval(tm);qpBusy=false;btn.disabled=false;$('big').textContent=pick.code;step('lobby');status('Connected. Joining the match...');renderLobby();return}
-  if(!room){clearInterval(tm);qpBusy=false;btn.disabled=false;return}// left in the meantime
+  if(hostLink){clearInterval(tm);qpBusy=false;qpDisable(false);$('big').textContent=pick.code;step('lobby');status(mode===0?'Connected. Joining the match...':'Connected. The match starts when the host presses Start.');renderLobby();return}
+  if(!room){clearInterval(tm);qpBusy=false;qpDisable(false);return}// left in the meantime
   if(performance.now()-t0>8000){clearInterval(tm);giveUp()}},200);
 }
-{const q=$('qplay');if(q)q.onclick=quickPlay}
+QPB.forEach((id,m)=>{const b=$(id);if(b)b.onclick=()=>quickPlay(m)});
 
 // ---------- the rest needs the CrazyGames SDK ----------
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
@@ -126,9 +130,12 @@ function startWatchers(){const sdk=CG.sdk;let playing=false,wasEnding=false,wasO
   if(go&&ending&&!wasEnding&&(ELIM()||practice||(isHost&&alone())))setTimeout(midgame,2500);// match over (BR / Squads go back to the lobby; a solo host's next round waits for the ad)
   if(go&&me.out&&!wasOut&&!ending&&ELIM())setTimeout(midgame,2000);// eliminated, now spectating
   wasEnding=!!(go&&ending);wasOut=!!(go&&me.out);
-  // CrazyGames invite button while you're in a lobby that can be joined
-  const code=($('big').textContent||'').trim(),n=roster().filter(e=>e.id!=='bot').length;
-  const key=(room&&!go&&!practice&&/^[A-HJ-NP-Z2-9]{4}$/.test(code)&&n<8)?code:'';
+  // CrazyGames invite button + Copy invite link whenever your room can be joined: in the lobby, or during a
+  // free-for-all match (people can join those halfway). Hidden when the room is full, between rounds, or while a
+  // Battle Royale / Squads match is on (someone joining then would only be able to spectate).
+  const code=($('big').textContent||'').trim(),n=roster().filter(e=>!isBot(e)).length;
+  const joinable=!go||(gm===0&&!ending);
+  const key=(room&&!practice&&/^[A-HJ-NP-Z2-9]{4}$/.test(code)&&n<8&&joinable)?code:'';
   if(key!==invKey){invKey=key;if(key){if(typeof sdk.game.showInviteButton==='function')safe(()=>sdk.game.showInviteButton({room:key}))}
    else if(typeof sdk.game.hideInviteButton==='function')safe(()=>sdk.game.hideInviteButton())}
   inviteUI(key);
@@ -146,9 +153,9 @@ function midgame(){const sdk=CG.sdk;if(!sdk||CG.adBusy||Date.now()-CG.lastAd<180
 // a practice match restarts by itself after 6 s; if an ad is playing, start the next one once it's over
 if(typeof newMatch==='function'){const n0=newMatch;newMatch=function(){if(CG.adBusy&&(practice||(isHost&&alone()))){const a=arguments,t=this;CG.after=()=>newMatch.apply(t,a);return}return n0.apply(this,arguments)}}
 
-// "Copy invite link" button in the lobby (CrazyGames only)
-function inviteUI(code){let b=$('cginv');const row=$('privrow');if(!row)return;
- if(!b){b=document.createElement('button');b.id='cginv';b.className='alt';b.textContent='\u{1F517} Copy invite link';b.style.marginTop='6px';row.appendChild(b);
+// "Copy invite link" button under the room code, for everyone in the room, host or not (CrazyGames only)
+function inviteUI(code){let b=$('cginv');const bar=$('codebar');if(!bar)return;
+ if(!b){b=document.createElement('button');b.id='cginv';b.className='alt';b.textContent='\u{1F517} Copy invite link';b.style.marginTop='8px';(bar.firstElementChild||bar).appendChild(b);
   b.onclick=()=>{const c=b.dataset.code;if(!c)return;let link='';safe(()=>{link=CG.sdk.game.inviteLink({room:c})});if(!link)return;
    const ok=()=>status('Invite link copied. Send it to your friends!');
    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(link).then(ok,()=>fallback(link,ok));else fallback(link,ok)}}

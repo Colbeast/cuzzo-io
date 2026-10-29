@@ -26,6 +26,12 @@ code, which understands wildcards.
 4. Test it with their **Preview** tool before submitting. Check the Play now button, hosting a room,
    joining with a code from another browser, and the room list.
 
+## Questions in the submission form
+- **Progress save: choose the option that uses the CrazyGames SDK (data module).** The game now saves levels, XP, unlocked
+  outfits, challenges and campaign progress. It always saves in the browser, and also through the SDK's data module so a
+  logged-in player keeps their progress on every device. CrazyGames turns the data module off unless you pick Progress Save.
+- Mute audio: supported. Chat: supports disable chat. Multiplayer: yes (up to 8), invite link and instant multiplayer supported.
+
 ## 3. Controls text you can paste
 Desktop: WASD move, mouse aim, left click shoot, right click aim, R reload, 1-4 or scroll to switch weapon,
 Space jump, Shift sprint, C crouch, E use / open doors / enter cars, Q use powerup, M map,
@@ -34,10 +40,19 @@ Tab inventory (Battle Royale), / chat, Esc pause.
 Mobile: left thumb moves (push all the way up to sprint), right thumb looks around, on-screen buttons for
 fire, aim, jump, crouch, reload, swap and use.
 
+## Description you can paste
+Cuzzo io is a blocky arena shooter. Jump straight into free-for-all matches with Play now, team up in Squads, drop into
+Battle Royale, or play the 12-mission story campaign offline and take back Cuzzo City from the Static Crew. Level up to unlock
+16 outfits, finish daily challenges, and earn three stars on every mission. Bots fill matches until real players join.
+
 ## What's already done for their rules
 - SDK: loading start/stop and gameplay start/stop (pausing, menus, spectating and ads all count as stopped)
-- One click (Play now) from the menu to gameplay: it joins a running public free-for-all match if there is one,
-  otherwise it opens a new public match and starts it right away (the next player who presses Play now joins)
+- One click from the menu to gameplay: a Play now button for each mode. Free-for-all joins a running public match;
+  Battle Royale and Squads join a public lobby waiting to start; otherwise a new match starts immediately with bots.
+  The free-for-all button: it joins a running public free-for-all match if there is one,
+  otherwise it opens a new public match and starts it right away (the next player who presses Play now joins).
+  Bots fill the match until real players arrive, so it's never empty
+- Progress is saved with the SDK's data module (and in the browser)
 - The player's CrazyGames username is their in-game name
 - Follows CrazyGames' mute-audio and disable-chat settings
 - Chat moderation: a filter for swear words and slurs in chat, player names and room names
@@ -46,7 +61,10 @@ fire, aim, jump, crouch, reload, swap and use.
   - audio muted and the screen blocked while an ad plays
   - the game still works with an adblocker (no ads, nothing taken away)
   - banners only on the menu screens, never covering the menu, cleared when a match starts
-- Invite links, joining from an invite link, and instant multiplayer (starts a private room)
+- Invite link & button: shown to everyone in a room whenever it can be joined (lobby, or a free-for-all match in
+  progress), hidden when it's full, between rounds, or during Battle Royale / Squads; joining from an invite link
+- IsInstantMultiplayer: the party leader is put straight into a new private room, and friends join through the
+  invite link
 - Players stay together between rounds (same room)
 - Works with mouse and keyboard and with touch, in landscape
 

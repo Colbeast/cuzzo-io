@@ -185,12 +185,12 @@ function drawMapExtras(g,toS,s,u,W,rot,yw){
 // =====================================================================================================
 // weapon ids: see WP in game.js. kind 'melee' = swing, 'proj' = thrown/launched object, otherwise hitscan
 const LOADOUT=Array.from({length:10},()=>[0,1,2,3]);// every skin: pistol, rifle, shotgun, sniper
-const LO=()=>LOADOUT[me.sk]||LOADOUT[0];
+const LO=()=>(typeof clsLoadout==='function'&&clsLoadout())||LOADOUT[me.sk]||LOADOUT[0];
 function maxHP(){return 100}
-const skinSpeed=()=>1;
+const skinSpeed=()=>typeof clsSpeed==='function'?clsSpeed():1;
 // keep the selected weapon inside the current skin's loadout and rebuild the weapon bar
 let WLsk=-1;
-function loadoutSync(force){if(typeof LOOT==='function'&&LOOT())return;if(!force&&WLsk===me.sk&&LO().includes(me.w))return;WLsk=me.sk;const L=LO(),wl=$('wl');wl.innerHTML='';
+function loadoutSync(force){if(typeof LOOT==='function'&&LOOT())return;if(!force&&WLsk===me.sk+'|'+LO().join()&&LO().includes(me.w))return;WLsk=me.sk+'|'+LO().join();const L=LO(),wl=$('wl');wl.innerHTML='';
  L.forEach(i=>{const d=document.createElement('div');d.innerHTML='<b></b>'+WP[i].n+'<span class="am"></span>';wl.appendChild(d)});if(!L.includes(me.w))setW(L[0]);else hudW()}
 // remember the skin perk on the outfit picker
 function slotW(n){if(typeof LOOT==='function'&&LOOT()){lootSel(n);return}const L=LO();if(n<L.length)setW(L[n])}
@@ -202,7 +202,7 @@ function meleeHit(W){_mo.copy(typeof tpOrigin==='function'?tpOrigin():cam.positi
  for(const p of Object.values(players)){if(!p.R.g.visible||p.dead||mate(p))continue;const r=p.rt;_md.set(r.x-_mo.x,r.y+1.1-_mo.y,r.z-_mo.z);const d=_md.length();if(d>W.rng+.6)continue;_md.normalize();
   if(_md.dot(_mf)<(W.rng>4?.9:.72))continue;if(wallDist(_mo,_md)<d-.7)continue;if(d<bd){bd=d;best=p}}
  const tip=_mo.clone().addScaledVector(_mf,Math.min(W.rng,best?bd:W.rng));if(W.lash){tracer(_mo.clone().add(new V(0,-.25,0)),tip,0x6b4423);send({t:'s',l:[[..._mo.clone().add(new V(0,-.25,0)).toArray(),...tip.toArray()]],q:1,c:0x6b4423})}
- swing=1;beep(W.f,.08,'triangle');if(best)hitPlayer(best,W.d,false)}
+ swing=1;if(typeof sfx==='function')sfx('whoosh',{vol:.55,rate:1.9});else beep(W.f,.08,'triangle');if(best)hitPlayer(best,W.d,false)}
 let swing=0;
 // ---------- projectiles: tennis balls, ninja stars, crossbow bolts, pitchforks and corn grenades ----------
 // the thrower simulates its own and decides hits; everyone else gets a copy just to see it fly
@@ -216,12 +216,12 @@ const _pd=new V();
 // real bullets for the 4 basic guns: they take time to fly and drop a little over long distances
 const BLG=new THREE.BoxGeometry(.035,.035,1.4).translate(0,0,-.7),BLM={};
 function blMesh(c){const m=BLM[c]||(BLM[c]=new THREE.MeshBasicMaterial({color:c,fog:false,transparent:true,opacity:.9}));return new THREE.Mesh(BLG,m)}
-Object.assign(PJT,{0:{sp:280,g:7,life:.9,bl:1,m:()=>blMesh(0xffe08a)},1:{sp:320,g:6,life:1.1,bl:1,m:()=>blMesh(0xffd060)},2:{sp:220,g:9,life:.26,bl:1,m:()=>blMesh(0xffc080)},3:{sp:520,g:5,life:2.4,bl:1,m:()=>blMesh(0xbfe8ff)},17:{sp:300,g:7,life:1,bl:1,m:()=>blMesh(0xffe08a)},18:{sp:260,g:8,life:.75,bl:1,m:()=>blMesh(0xffe08a)},20:{sp:21,g:15,life:2.6,boom:'frag',spin:1,m:()=>makeGun(20,0)}});
-function bulletFire(w,o,d){const T=PJT[w],p=o.clone().addScaledVector(d,.6),v=d.clone().multiplyScalar(T.sp);pjSpawn(w,p,v,true,me.id);PJ[PJ.length-1].dm=WP[w].d*(typeof rarD==='function'?rarD():1);return[...p.toArray(),...v.toArray()].map(n=>+n.toFixed(2))}
-function bulletMsg(m){(m.b||[]).forEach(s=>pjSpawn(m.w,new V(s[0],s[1],s[2]),new V(s[3],s[4],s[5]),false,m.f));const s=m.b&&m.b[0];if(s&&!m.q){if(typeof vaShot==='function'&&!mate(players[m.f]))vaShot(s[0],s[2]);beep(200,.08)}}
+Object.assign(PJT,{0:{sp:280,g:7,life:.9,bl:1,m:()=>blMesh(0xffe08a)},1:{sp:320,g:6,life:1.1,bl:1,m:()=>blMesh(0xffd060)},2:{sp:220,g:9,life:.26,bl:1,m:()=>blMesh(0xffc080)},3:{sp:520,g:5,life:2.4,bl:1,m:()=>blMesh(0xbfe8ff)},17:{sp:300,g:7,life:1,bl:1,m:()=>blMesh(0xffe08a)},4:{sp:290,g:7,life:.9,bl:1,m:()=>blMesh(0xffe08a)},7:{sp:330,g:6,life:1,bl:1,m:()=>blMesh(0xffd88a)},10:{sp:300,g:7,life:.9,bl:1,m:()=>blMesh(0xd8e0e8)},18:{sp:260,g:8,life:.75,bl:1,m:()=>blMesh(0xffe08a)},20:{sp:21,g:15,life:2.6,boom:'frag',spin:1,m:()=>makeGun(20,0)}});
+function bulletFire(w,o,d){const T=PJT[w]||PJT[1],p=o.clone().addScaledVector(d,.6),v=d.clone().multiplyScalar(T.sp);pjSpawn(PJT[w]?w:1,p,v,true,me.id);PJ[PJ.length-1].dm=WP[w].d*(typeof rarD==='function'?rarD():1);return[...p.toArray(),...v.toArray()].map(n=>+n.toFixed(2))}
+function bulletMsg(m){(m.b||[]).forEach(s=>pjSpawn(m.w,new V(s[0],s[1],s[2]),new V(s[3],s[4],s[5]),false,m.f));const s=m.b&&m.b[0];if(s&&!m.q){if(typeof vaShot==='function'&&!mate(players[m.f]))vaShot(s[0],s[2]);if(typeof shotSound==='function')shotSound(s[0],s[1],s[2],m.w);else beep(200,.08)}}
 
 function pjTick(dt){for(let i=PJ.length-1;i>=0;i--){const q=PJ[i],T=q.T;q.t+=dt;const op=q.p.clone();q.v.y-=T.g*dt;q.p.addScaledVector(q.v,dt);const seg=q.p.distanceTo(op);_pd.copy(q.p).sub(op).normalize();
-  let end=q.t>T.life,wall=seg>0?wallDist(op,_pd):1e9;if(wall<seg){q.p.copy(op).addScaledVector(_pd,Math.max(0,wall-.05));end=true}
+  let end=q.t>T.life,wall=seg>0?wallDist(op,_pd):1e9;if(wall<seg){q.p.copy(op).addScaledVector(_pd,Math.max(0,wall-.05));end=true;if(T.bl&&typeof impactFx==='function')impactFx(q.p,_pd)}
   if(q.own&&!T.boom&&seg>0){let best=null,bd=Math.min(seg,wall);for(const p of Object.values(players)){if(!p.R.g.visible||p.dead||mate(p)||q.hit.has(p.id))continue;const h=hitP(p,op,_pd,bd);if(h&&h.d<bd){bd=h.d;best={p,hs:h.hs}}}
    if(best){q.hit.add(best.p.id);hitPlayer(best.p,Math.round((q.dm||WP[q.id].d)*(best.hs?2:1)),best.hs);end=true}}
   if(T.boom&&!end)for(const p of Object.values(players)){if(!p.R.g.visible||p.dead||mate(p))continue;const r=p.rt;if(Math.hypot(r.x-q.p.x,r.y+1-q.p.y,r.z-q.p.z)<1.2){end=true;break}}
