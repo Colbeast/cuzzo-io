@@ -42,8 +42,10 @@
  <div id="codebar" class="row card" style="justify-content:space-between"><div><h2 style="margin:0">Server code</h2><div id="big">....</div></div><div id="gmt">Share the code with friends<br>Free-for-all &middot; first to 15 kills</div></div>
  <div id="privrow" style="display:none"><div class="row"><button id="rpub">&#127760; Public</button><button id="rpriv" class="alt">&#128274; Private</button></div><p class="fine" id="privh"></p></div>
  <h2>Players</h2><div id="plist"></div>
+ <div id="botrow" class="row"><span class="blab">Bots</span><button id="bminus" class="alt">&minus;</button><b id="bnum">0</b><button id="bplus" class="alt">+</button><small id="bhint"></small></div>
+ <div id="lobme" class="card"><img id="lmpic" class="pic"><div class="lmi"><b id="lmname">Player</b><small id="lmsub"></small><div class="pbtns"><button id="chs2" class="alt">Outfit</button></div></div></div>
  <h2>Game mode</h2><div id="modes"><div class="tile on" id="m-ffa"><b>Free-for-all</b><span>First to 15 kills &middot; instant respawns</span></div><div class="tile" id="m-br"><b>Battle Royale</b><span>Huge map &middot; closing storm &middot; last one alive</span></div><div class="tile" id="m-sq"><b>Squads</b><span>2 teams of 4 &middot; drivable cars &middot; Pine Lake or Sunset Bay</span></div></div>
- <div id="vwrap"><h2>Vote for the map</h2><div id="vote"></div><p class="fine">Everyone in the lobby gets one vote. The map with the most votes is played when the host starts.</p></div><div id="mc"><img id="mimg"><div style="flex:1"><h2 style="margin:0 0 4px">Map</h2><b id="mn"></b><br><span id="md"></span><br><small id="mpick" style="color:var(--ac)"></small><div class="row" style="margin-top:12px"><button id="chmap" class="alt">Choose map</button><button id="vmode" class="alt">Map choice</button><button id="botsb" class="alt">Bots</button><button id="chs2" class="alt">Change outfit</button></div></div></div>
+ <div id="vwrap"><h2>Vote for the map</h2><div id="vote"></div><p class="fine">Everyone in the lobby gets one vote. The map with the most votes is played when the host starts.</p></div><div id="mc"><img id="mimg"><div style="flex:1"><h2 style="margin:0 0 4px">Map</h2><b id="mn"></b><br><span id="md"></span><br><small id="mpick" style="color:var(--ac)"></small><div class="row" style="margin-top:12px"><button id="chmap" class="alt">Choose map</button><button id="vmode" class="alt">Map choice</button></div></div></div>
  <button id="go">Start match</button><button id="leave" class="alt" style="width:100%;margin-top:8px">Leave</button>
 </div>
 <div id="s-camp" class="step"></div>
@@ -74,6 +76,7 @@
 <script src="js/fx.js"></script>
 <script src="js/progress.js"></script>
 <script src="js/classes.js"></script>
+<script src="js/camo.js"></script>
 <script src="js/menu3d.js"></script>
 <script src="js/campaign.js"></script>
 <script src="js/rooms.js"></script>

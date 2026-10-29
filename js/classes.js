@@ -1,6 +1,6 @@
 // ===== Free-for-all classes =====
 // Four classes, one built around each free-for-all gun, each with a secondary gun that suits it and a melee
-// weapon. Pick one on the main menu or in the pause menu; during a match the new class starts when you respawn.
+// weapon. Pick one at the start of each round, on the main menu or in the pause menu; it changes straight away, even mid-match.
 // Battle Royale (loot) and Squads keep their own weapons.
 const CLASSES=[
  {n:'Assault',w:[1,4,24],c:'#f0b23c',d:'The all-rounder. Rifle for most fights, a quick Glock when the rifle runs dry, and a machete.',st:[3,3,3]},
@@ -13,13 +13,13 @@ const clsOn=()=>gm===0&&!(typeof LOOT==='function'&&LOOT());
 function clsLoadout(){return clsOn()?CLASSES[CLS.act].w:null}
 function clsSpeed(){return clsOn()?(CLASSES[CLS.act].spd||1):1}
 function clsSet(i){if(!CLASSES[i])return;CLS.sel=i;if(PROG){PROG.cls=i;progSave()}
- const live=go&&!me.out&&me.hp>0&&!(me.dwait>0)&&clsOn();
- if(!live){CLS.act=i;try{loadoutSync(1)}catch(e){}}else if(CLS.act!==i)status(CLASSES[i].n+' selected. You switch to it when you respawn.');
+ // changes straight away, alive or not: new weapons with full ammo
+ if(go&&clsOn()&&!me.out)clsApply(i);else{CLS.act=i;try{loadoutSync(1)}catch(e){}}
  clsUI()}
 // new class takes over when you respawn
 {const r0=respawn;respawn=function(){if(CLS.act!==CLS.sel){CLS.act=CLS.sel;const o=r0.apply(this,arguments);try{loadoutSync(1)}catch(e){}return o}return r0.apply(this,arguments)}}
 // ---------- picker ----------
-{const b=document.createElement('div');b.id='clsbox';b.innerHTML='<div class="cbx"><h3>Choose your class</h3><p class="fine">Free-for-all only. During a match your new class starts when you respawn.</p><div id="clsl"></div><div class="row" style="justify-content:center;margin-top:12px"><button id="clsx" class="alt">Close</button></div></div>';document.body.appendChild(b);
+{const b=document.createElement('div');b.id='clsbox';b.innerHTML='<div class="cbx"><h3>Choose your class</h3><p class="fine">Free-for-all only. Your class changes straight away, with full ammo.</p><div id="clsl"></div><div class="row" style="justify-content:center;margin-top:12px"><button id="clsx" class="alt">Close</button></div></div>';document.body.appendChild(b);
  b.onclick=e=>{if(e.target===b)clsClose()};$('clsx').onclick=clsClose}
 const SLOTN=['Primary','Secondary','Melee'],STN=['Range','Close up','Mobility'];
 function clsOpen(){const L=$('clsl');L.innerHTML=CLASSES.map((c,i)=>'<button class="clc'+(i===CLS.sel?' on':'')+'" data-i="'+i+'" style="--cc:'+c.c+'"><b>'+c.n+'</b>'+
@@ -29,7 +29,7 @@ function clsOpen(){const L=$('clsl');L.innerHTML=CLASSES.map((c,i)=>'<button cla
  $('clsbox').style.display='flex'}
 function clsClose(){$('clsbox').style.display='none'}
 addEventListener('keydown',e=>{if($('clsbox').style.display==='flex'&&e.code==='Escape')clsClose()});
-function clsUI(){const t='Class: '+CLASSES[CLS.sel].n;['clsb1','clsb2'].forEach(id=>{const b=$(id);if(b)b.innerHTML='<span>&#9881;</span> '+t})}
+function clsUI(){const t=CLASSES[CLS.sel].n;['clsb1','clsb2'].forEach(id=>{const b=$(id);if(b)b.innerHTML='<span>&#9881;</span> '+t})}
 {const add=(id,after,cls)=>{const a=$(after);if(!a)return;const b=document.createElement('button');b.id=id;b.className=cls||'alt';a.parentNode.insertBefore(b,a.nextSibling);b.onclick=clsOpen};
  add('clsb1','chs1');add('clsb2','chs2');
  const r0=renderLobby;renderLobby=function(){const o=r0.apply(this,arguments);try{const b=$('clsb2');if(b)b.style.display=gm===0?'':'none'}catch(e){}return o}}

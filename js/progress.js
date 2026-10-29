@@ -5,7 +5,7 @@
 const PSAVE='cuzzo_save';
 const LVMAX=50,xpNeed=l=>500+(l-1)*175;// XP needed to go from level l to l+1
 // skins: level needed (0 = from the start). Campaign rewards can unlock some early (see js/campaign.js).
-const SKREQ={0:0,1:0,9:0,15:0,11:2,2:3,12:4,4:5,8:6,3:8,13:10,5:12,10:14,14:16,7:18,6:20};
+const SKREQ={0:0,1:0,9:0,15:0,11:2,2:3,12:4,4:5,8:6,16:7,3:8,17:9,13:10,5:12,18:13,10:14,19:15,14:16,7:18,20:19,6:20};
 const CHPOOL=[
  {k:'kills',n:15,t:'Get 15 eliminations',xp:250},{k:'kills',n:30,t:'Get 30 eliminations',xp:400},
  {k:'hs',n:5,t:'Get 5 headshot eliminations',xp:280},{k:'win',n:1,t:'Win a match',xp:350},

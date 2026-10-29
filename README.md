@@ -12,6 +12,7 @@ js/extras.js            drivable cars, third-person camera, car and squadmate ma
 js/guns.js              detailed first-person weapon models
 js/bots.js              bots: fill free-for-all, Battle Royale and Squads matches, and the campaign's enemies, allies and bosses
 js/classes.js           the four free-for-all classes and the class picker
+js/camo.js              gun skins (camo patterns, unlocks, picker, showing them on every gun)
 js/nav.js               walkable grid of the map and A* path finding for bots
 js/juice.js             sound effects, hit/kill feedback, kill streaks, damage direction, death screen, sparks
 js/progress.js          XP, levels, unlockable outfits, daily challenges, match summary (saved in the browser)
@@ -40,6 +41,16 @@ Texture letters: `p` plaster, `b` brick, `w` wood siding, `x` crate, `m` corruga
 `c` concrete, `f` ground/grass detail, `g` skyscraper windows, `t` roof shingles,
 `o` door planks, `r` rock, `e` glow, `z` thatch, `2` coral stone, `4` dock planks, `5` ice blocks, plus newer floor/road/siding textures
 (see `tools/build_textures.py` for the full list).
+
+## v7.5: bot count, gun skins, 5 new outfits, smarter bots
+- **Choose how many bots.** In the lobby the host sets the number of bots (0-7) with - / + for the selected mode: free-for-all, Battle Royale and Squads each remember their own number. Bots join the lobby right away, vote for maps, and play the match; they still make room when real players need the places. Kicking a bot lowers the number. Play now uses your saved numbers (4 / 5 / 5 to start).
+- **Bots are tagged again:** names start with "BOT" and the lobby list shows a BOT label.
+- **Bots ride the bus in Squads** (and Battle Royale) and jump out along its route, like players.
+- **Smarter bots:** they duck behind cover when they're hurt, reloading or nearly dead, then peek back out; they stick with their team in Squads; they go after weakened enemies first; and they aim a little ahead of moving targets.
+- **Gun skins.** 12 camos (Factory, Woodland, Desert, Arctic, Tiger, Cherry Blossom, Neon, Lava, Galaxy, Gold, Diamond, and Static for beating BOLT-9000), unlocked by levelling up. Pick one with the Gun skin button (menu or lobby); it shows on your guns in first person and on your character for everyone else.
+- **5 new outfits:** Viking, Firefighter, Mummy, Detective and Alien (unlock at levels 7, 9, 13, 15 and 19).
+- **Changing class is instant,** alive or dead, with full ammo.
+- **Fixed: your outfit didn't show in the lobby.** The lobby now has a card with your outfit, name, class and gun skin and the buttons to change them.
 
 ## v7.4: class pick every round, secondaries fixed
 - **Pick your class at the start of every free-for-all round** (and when you join a match): a panel shows the four classes for 10 seconds. Press 1-4 (or tap a card on a phone) to switch straight away with full ammo; Enter or waiting keeps your current class. You can still change class from the menu between rounds (it starts when you respawn).

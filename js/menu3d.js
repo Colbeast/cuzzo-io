@@ -22,7 +22,7 @@ let pvSkin=null;
  let last=0,acc=0;
  (function loop(t){requestAnimationFrame(loop);const dt=Math.min(.1,(t-last)/1000);last=t;acc+=dt;if(acc<1/30)return;const a=acc;acc=0;
   if(go||cv.offsetParent===null)return;// not on screen
-  if(me.sk!==sk)pvSkin(me.sk);
+  if(me.sk!==sk)pvSkin(me.sk);if(typeof applyCamo==='function'&&R.gcA!==(me.gc|0)){applyCamo(R.guns[1],me.gc|0);R.gcA=me.gc|0}
   if(drag==null){vel*=.9;rot+=vel+a*.35}const s=Math.sin(t/900);
   R.g.rotation.y=rot;R.g.position.y=0;R.head.rotation.x=Math.sin(t/1700)*.08;R.head.rotation.y=Math.sin(t/2300)*.25;R.arms.rotation.x=Math.PI/2-.35+s*.03;
   R.legs[0].rotation.x=R.legs[1].rotation.x=0;R.g.scale.y=1+s*.006;
